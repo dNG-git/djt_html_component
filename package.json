@@ -1,0 +1,49 @@
+{
+    "name": "djt-xhtml5-riot-tag",
+    "license": "MPL-2.0",
+    "description": "'djt-xhtml5-riot-tag' adds additional common methods to Riot.js tags.",
+    "homepage": "https://www.direct-netware.de/redirect?djt;xhtml5;riot_tag",
+    "version": "1.0.0",
+    "private": true,
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dNG-git/djt_xhtml5_riot_tag.git"
+    },
+
+    "main": "./lib/cjs/module.js",
+    "module": "./lib/module.js",
+    "types": "./lib/module.d.ts",
+
+    "scripts": {
+        "install-clean": "npm install --no-save",
+        "update": "npm update",
+        "build": "npm run build-lib && npm run build-dist",
+        "build-dist": "./node_modules/.bin/rollup -c",
+        "build-lib": "npm run build-lib:es6 && npm run build-lib:cjs",
+        "build-lib:es6": "./node_modules/.bin/tsc",
+        "build-lib:cjs": "./node_modules/.bin/tsc -p tsconfig.cjs.json",
+        "prepare": "npm run build-lib"
+    },
+
+    "dependencies": {
+        "djt-object-tree-lookup": "git://github.com/dNG-git/djt_object_tree_lookup.git#semver:^1.0.0",
+        "djt-promised-require": "git://github.com/dNG-git/djt_promised_require.git#semver:^1.0.0",
+        "riot": "^3.9.1",
+        "zepto": "^1.2.0"
+    },
+
+    "devDependencies": {
+        "rollup": "^0.57.1",
+        "rollup-plugin-commonjs": "^9.1.0",
+        "rollup-plugin-node-resolve": "^3.3.0",
+        "rollup-plugin-typescript2": "^0.12.0",
+        "rollup-plugin-uglify": "^3.0.0",
+        "tslint": "^5.9.1",
+        "typescript": "^2.8.1",
+        "uglify-es": "^3.3.9",
+
+        "@types/riot": "^3.6.1",
+        "@types/zepto": "^1.0.29"
+    }
+}
