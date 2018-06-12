@@ -669,7 +669,7 @@ export abstract class RiotTag {
      * @return Promise
      * @since  v1.0.0
      */
-    protected static async require(...modules: string[]) {
+    public static async require(...modules: string[]) {
         const promise = PromisedRequire.require(...modules);
 
         // tslint:disable-next-line:no-any
@@ -679,7 +679,7 @@ export abstract class RiotTag {
             for (const key of Object.keys(modulesLoaded)) {
                 moduleLoaded = modulesLoaded[key];
 
-                if (RiotTag.isPrototypeOf(moduleLoaded)) {
+                if (RiotTag.prototype.isPrototypeOf(moduleLoaded)) {
                     // tslint:disable-next-line:no-any
                     (moduleLoaded as any).register();
                 }

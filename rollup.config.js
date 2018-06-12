@@ -18,7 +18,7 @@ import CommonJs from 'rollup-plugin-commonjs';
 import Minify from 'uglify-es';
 import Resolve from 'rollup-plugin-node-resolve';
 import TypeScript from 'rollup-plugin-typescript2';
-import Uglify from 'rollup-plugin-uglify';
+import { uglify as Uglify } from 'rollup-plugin-uglify';
 
 export default {
     input: 'src/module.ts',
