@@ -435,6 +435,23 @@ export abstract class RiotTag {
      * @since v1.0.0
      */
     public static attachAndMount(element?: Element | string, opts?: TagOpts) {
+        if (!this.isRegistered) {
+            this.register();
+        }
+
+        return this.attachTagNameAndMount(element, this.tagName, opts);
+    }
+
+    /**
+     * Attach the tag name to the given (X)HTML element and mount it.
+     *
+     * @param element (X)HTML5 element or DOM selector
+     * @param tagName Riot.js tag name to attach and mount
+     * @param opts Riot.js tag options
+     *
+     * @since v1.2.0
+     */
+    public static attachTagNameAndMount(element: Element | string | undefined, tagName: string, opts?: TagOpts) {
         if (!element) {
             element = 'body';
         }
@@ -443,11 +460,11 @@ export abstract class RiotTag {
             element = util.dom.$(element);
         }
 
-        // tslint:disable-next-line:no-any
-        const node = util.dom.mkEl(this.tagName);
-        element.appendChild(node);
+        if (!element) {
+            throw new Error('Parent DOM element not found');
+        }
 
-        this.mount(node, opts);
+        return util.tags.mountTo(element, tagName, opts);
     }
 
     /**
@@ -594,7 +611,9 @@ export abstract class RiotTag {
             element = this.tagName;
         }
 
-        if (element instanceof Element && '_tag' in Object.keys(element)) {
+        const isDomElement = Element.prototype.isPrototypeOf(element);
+
+        if (isDomElement && '_tag' in Object.keys(element)) {
             // tslint:disable-next-line:no-any
             _return = (element as any)._tag;
 
@@ -606,7 +625,7 @@ export abstract class RiotTag {
                 _return.update(opts);
             }
         } else {
-            if (this.isDomManipulationAvailable && (!opts.originalElementData)) {
+            if (isDomElement && this.isDomManipulationAvailable && (!opts.originalElementData)) {
                 const $element = $(element);
 
                 if ($element.length == 1) {
@@ -662,12 +681,38 @@ export abstract class RiotTag {
     }
 
     /**
+     * Replaces all children of the given (X)HTML element and mount the tag
+     * name instead.
+     *
+     * @param element (X)HTML5 element or DOM selector
+     * @param tagName Riot.js tag name to attach and mount
+     * @param opts Riot.js tag options
+     *
+     * @since v1.2.0
+     */
+    public static replaceWithTagNameAndMount(element: Element | string, tagName: string, opts?: TagOpts) {
+        if (typeof element == "string") {
+            element = util.dom.$(element);
+        }
+
+        if (!element) {
+            throw new Error('Parent DOM element not found');
+        }
+
+        if (element.firstChild) {
+            util.dom.setInnerHTML(element, '');
+        }
+
+        return this.attachTagNameAndMount(element, tagName, opts);
+    }
+
+    /**
      * Requires the given Riot.js tags.
      *
      * @param modules JavaScript module
      *
      * @return Promise
-     * @since  v1.0.0
+     * @since  v1.1.0
      */
     public static async require(...modules: string[]) {
         const promise = PromisedRequire.require(...modules);
