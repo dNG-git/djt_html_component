@@ -52,7 +52,7 @@ export default {
             ignore: [ 'require' ],
             namedExports: {
                 'riot/riot.js': [ 'mount', 'tag', 'Tag', 'util' ],
-                'tslib': [ '__awaiter', '__generator' ]
+                'tslib': [ '__awaiter', '__extends', '__generator' ]
             }
         }),
 

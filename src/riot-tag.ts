@@ -105,7 +105,9 @@ export abstract class RiotTag {
             this.id = this.instanceClass.getRandomDomId();
         }
 
-        this.isWindowResizeRelevant = (opts.listenForWindowResize != false);
+        this.isWindowResizeRelevant = (
+            'listenForWindowResize' in opts && opts.listenForWindowResize != false
+        );
 
         this.onBeforeMount = this.onBeforeMount.bind(this);
         this.onMounted = this.onMounted.bind(this);
@@ -117,6 +119,16 @@ export abstract class RiotTag {
         this.one('before-mount', this.onBeforeMount);
         this.one('mount', this.onMounted);
         this.one('unmount', this.onUnmounted);
+    }
+
+    /**
+     * Returns the corresponding class of the calling instance.
+     *
+     * @return Class object
+     * @since  v1.0.0
+     */
+    protected get instanceClass() {
+        return Object.getPrototypeOf(this).constructor;
     }
 
     /**
@@ -160,19 +172,13 @@ export abstract class RiotTag {
     /**
      * Called once for tag event "before-mount".
      *
-     * @param _ Event object
-     *
      * @since v1.0.0
      */
-    public onBeforeMount(_: Event) {
-        this.on('resize', this.onResize);
-
+    public onBeforeMount() {
         let $self;
 
         if (this.isElementSizeRelevant) {
-            if (this.originalElementData) {
-                this.updateOriginalElementSizeData();
-            }
+            this.on('resize', this.onResize);
 
             if (this.instanceClass.isDomManipulationAvailable && this.isWindowResizeRelevant) {
                 if ($self === undefined) {
@@ -211,11 +217,9 @@ export abstract class RiotTag {
     /**
      * Called once for tag event "mount".
      *
-     * @param _ Event object
-     *
      * @since v1.0.0
      */
-    public onMounted(_: Event) {
+    public onMounted() {
         if (this.isElementSizeRelevant
             && (!this.originalElementData)
            ) {
@@ -226,22 +230,19 @@ export abstract class RiotTag {
     /**
      * Called for tag event "resize".
      *
-     * @param _ Event object
-     *
      * @since v1.0.0
      */
-    public onResize(_: Event) {
+    // tslint:disable-next-line:no-any
+    public onResize() {
         this.updateOriginalElementSizeData();
     }
 
     /**
      * Called once for tag event "unmount".
      *
-     * @param _ Event object
-     *
      * @since v1.0.0
      */
-    public onUnmounted(_: Event) {
+    public onUnmounted() {
         $(this.riotTagInstance.root).off(`.djt-event-listener-${this.id}`);
         $(self).off(`.djt-event-listener-${this.id}`);
     }
@@ -283,6 +284,32 @@ export abstract class RiotTag {
     // tslint:disable-next-line:no-any
     public trigger(event: string, ...args: any[]) {
         this.riotTagInstance.trigger(event, ...args);
+    }
+
+    /**
+     * riotjs.com: Execute all callback functions that listen to the given 'event'.
+     *
+     * @param event Event ID
+     *
+     * @since v1.3.0
+     */
+    // tslint:disable-next-line:no-any
+    public triggerOnSiblings(event: string, ...args: any[]) {
+        if (this.riotTagInstance.parent && this.riotTagInstance.parent.tags) {
+            for (const siblingTagName of Object.keys(this.riotTagInstance.parent.tags)) {
+                let siblingTags = this.riotTagInstance.parent.tags[siblingTagName];
+
+                if (!Array.isArray(siblingTags) && siblingTags) {
+                    siblingTags = [ siblingTags ];
+                }
+
+                for (const siblingTag of siblingTags) {
+                    if (siblingTag !== this.riotTagInstance) {
+                        siblingTag.trigger(event, ...args);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -349,16 +376,6 @@ export abstract class RiotTag {
                 height: height
             });
         }
-    }
-
-    /**
-     * Returns the corresponding class of the calling instance.
-     *
-     * @return Class object
-     * @since  v1.0.0
-     */
-    protected get instanceClass() {
-        return Object.getPrototypeOf(this).constructor;
     }
 
     /**
@@ -487,62 +504,6 @@ export abstract class RiotTag {
     }
 
     /**
-     * Returns the given hexadecimal value as a number if possible.
-     *
-     * @param value hexadecimal value
-     *
-     * @return Value as number; undefined otherwise
-     * @since  v1.0.0
-     */
-    protected static getHexValueAsNumber(value: string) {
-        let numberValue: number;
-
-        if (typeof value == 'string') {
-            if (value[0] == '#') {
-                value = value.substr(1);
-            } else if (value.substr(0, 2) == '0x') {
-                value = value.substr(2);
-            }
-        }
-
-        numberValue = parseInt(value, 16);
-        if (isNaN(numberValue)) { numberValue = undefined; }
-
-        return numberValue;
-    }
-
-    /**
-     * Returns the given value as a number if possible.
-     *
-     * @param value Decimal value
-     *
-     * @return Value as number; undefined otherwise
-     * @since  v1.0.0
-     */
-    protected static getValueAsNumber(value: string) {
-        let numberValue: number;
-
-        numberValue = parseInt(value, 10);
-        if (isNaN(numberValue)) { numberValue = undefined; }
-
-        return numberValue;
-    }
-
-    /**
-     * Returns if the client supports the "requestAnimationFrame()" method.
-     *
-     * @return True if the client supports "requestAnimationFrame()"
-     * @since  v1.0.0
-     */
-    public static get isRequestAnimationFrameAvailable() {
-        if (this._isRequestAnimationFrameAvailable === undefined) {
-            this.validateRequestAnimationFrameSupport();
-        }
-
-        return this._isRequestAnimationFrameAvailable;
-    }
-
-    /**
      * Returns an properties object for the given $DOM element and its children.
      *
      * @param $element $DOM element
@@ -578,6 +539,31 @@ export abstract class RiotTag {
     }
 
     /**
+     * Returns the given hexadecimal value as a number if possible.
+     *
+     * @param value hexadecimal value
+     *
+     * @return Value as number; undefined otherwise
+     * @since  v1.0.0
+     */
+    protected static getHexValueAsNumber(value: string) {
+        let numberValue: number;
+
+        if (typeof value == 'string') {
+            if (value[0] == '#') {
+                value = value.substr(1);
+            } else if (value.substr(0, 2) == '0x') {
+                value = value.substr(2);
+            }
+        }
+
+        numberValue = parseInt(value, 16);
+        if (isNaN(numberValue)) { numberValue = undefined; }
+
+        return numberValue;
+    }
+
+    /**
      * Returns a random value usable as a DOM ID.
      *
      * @return Random value usable as DOM ID
@@ -585,6 +571,37 @@ export abstract class RiotTag {
      */
     protected static getRandomDomId() {
         return 'djt-' + Math.random().toString().replace('.', '');
+    }
+
+    /**
+     * Returns the given value as a number if possible.
+     *
+     * @param value Decimal value
+     *
+     * @return Value as number; undefined otherwise
+     * @since  v1.0.0
+     */
+    protected static getValueAsNumber(value: string) {
+        let numberValue: number;
+
+        numberValue = parseInt(value, 10);
+        if (isNaN(numberValue)) { numberValue = undefined; }
+
+        return numberValue;
+    }
+
+    /**
+     * Returns if the client supports the "requestAnimationFrame()" method.
+     *
+     * @return True if the client supports "requestAnimationFrame()"
+     * @since  v1.0.0
+     */
+    public static get isRequestAnimationFrameAvailable() {
+        if (this._isRequestAnimationFrameAvailable === undefined) {
+            this.validateRequestAnimationFrameSupport();
+        }
+
+        return this._isRequestAnimationFrameAvailable;
     }
 
     /**

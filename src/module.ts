@@ -14,5 +14,6 @@
  * @license Mozilla Public License, v. 2.0
  */
 
+export { DynamicHtmlContent } from './dynamic-html-content';
 export { OriginalElementData } from './original-element-data';
 export { RiotTag } from './riot-tag';
