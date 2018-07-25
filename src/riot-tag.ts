@@ -61,7 +61,7 @@ export abstract class RiotTag {
     /**
      * Flag indicating that the instance is interested in window resize events.
      */
-    protected isWindowResizeRelevant = true;
+    protected isWindowResizeRelevant = false;
     /**
      * Original DOM element and child data like attributes and values.
      */
@@ -110,15 +110,15 @@ export abstract class RiotTag {
         );
 
         this.onBeforeMount = this.onBeforeMount.bind(this);
+        this.onBeforeUnmount = this.onBeforeUnmount.bind(this);
         this.onMounted = this.onMounted.bind(this);
         this.onResize = this.onResize.bind(this);
-        this.onUnmounted = this.onUnmounted.bind(this);
         this.onWindowResized = this.onWindowResized.bind(this);
         this.onWindowUnload = this.onWindowUnload.bind(this);
 
         this.one('before-mount', this.onBeforeMount);
+        this.one('before-unmount', this.onBeforeUnmount);
         this.one('mount', this.onMounted);
-        this.one('unmount', this.onUnmounted);
     }
 
     /**
@@ -187,7 +187,7 @@ export abstract class RiotTag {
 
                 // Hack around event listener registration with deprecated boolean return value
                 // tslint:disable-next-line:no-any
-                ($self as any).on(`resize.djt-event-listener-${this.id}`, this.onWindowResized);
+                ($self as any).on(`resize.djt-riot-tag-${this.id}`, this.onWindowResized);
             }
         }
 
@@ -196,8 +196,19 @@ export abstract class RiotTag {
                 $self = $(self);
             }
 
-            $self.one(`beforeunload.djt-event-listener-${this.id}`, this.onWindowUnload);
+            $self.one(`beforeunload.djt-riot-tag-${this.id}`, this.onWindowUnload);
         }
+    }
+
+    /**
+     * Called once for tag event "before-unmount".
+     *
+     * @since v1.3.1
+     */
+    public onBeforeUnmount() {
+        $(this.riotTagInstance.root).off(`.djt-riot-tag-${this.id}`);
+        $(self).off(`.djt-riot-tag-${this.id}`);
+        this.off('resize');
     }
 
     /**
@@ -238,16 +249,6 @@ export abstract class RiotTag {
     }
 
     /**
-     * Called once for tag event "unmount".
-     *
-     * @since v1.0.0
-     */
-    public onUnmounted() {
-        $(this.riotTagInstance.root).off(`.djt-event-listener-${this.id}`);
-        $(self).off(`.djt-event-listener-${this.id}`);
-    }
-
-    /**
      * Called on DOM event "resize".
      *
      * @param event Event object
@@ -264,7 +265,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * Called once for tag event "beforeunload".
+     * Called on DOM event "beforeunload".
      *
      * @param _ Event object
      *
@@ -358,7 +359,8 @@ export abstract class RiotTag {
                 };
             }
 
-            const $element = $(this.riotTagInstance.root);
+            // tslint:disable-next-line:no-any
+            const $element: any = $(this.riotTagInstance.root);
 
             let width = this.originalElementData.width;
             let height = this.originalElementData.height;
