@@ -109,16 +109,19 @@ export abstract class RiotTag {
             'listenForWindowResize' in opts && opts.listenForWindowResize != false
         );
 
+        this.onAnyDomChanged = this.onAnyDomChanged.bind(this);
         this.onBeforeMount = this.onBeforeMount.bind(this);
         this.onBeforeUnmount = this.onBeforeUnmount.bind(this);
         this.onMounted = this.onMounted.bind(this);
         this.onResize = this.onResize.bind(this);
+        this.onUnmounted = this.onUnmounted.bind(this);
         this.onWindowResized = this.onWindowResized.bind(this);
         this.onWindowUnload = this.onWindowUnload.bind(this);
 
-        this.one('before-mount', this.onBeforeMount);
-        this.one('before-unmount', this.onBeforeUnmount);
-        this.one('mount', this.onMounted);
+        this.on('before-mount', this.onBeforeMount);
+        this.on('before-unmount', this.onBeforeUnmount);
+        this.on('mount', this.onMounted);
+        this.on('unmount', this.onUnmounted);
     }
 
     /**
@@ -170,24 +173,33 @@ export abstract class RiotTag {
     }
 
     /**
+     * Called on custom DOM event "xdomchanged" including own triggered ones.
+     *
+     * @param event Event object
+     *
+     * @since v1.3.1
+     */
+    public onAnyDomChanged(event: Event) {
+        if (event.target !== this.riotTagInstance.root) {
+            this.onDomChanged(event);
+        }
+    }
+
+    /**
      * Called once for tag event "before-mount".
      *
      * @since v1.0.0
      */
     public onBeforeMount() {
-        let $self;
+        // tslint:disable-next-line:no-any
+        let $self: any;
 
         if (this.isElementSizeRelevant) {
             this.on('resize', this.onResize);
 
             if (this.instanceClass.isDomManipulationAvailable && this.isWindowResizeRelevant) {
-                if ($self === undefined) {
-                    $self = $(self);
-                }
-
-                // Hack around event listener registration with deprecated boolean return value
-                // tslint:disable-next-line:no-any
-                ($self as any).on(`resize.djt-riot-tag-${this.id}`, this.onWindowResized);
+                $self = $(self);
+                $self.on(`resize.djt-riot-tag-${this.id}`, this.onWindowResized);
             }
         }
 
@@ -212,6 +224,20 @@ export abstract class RiotTag {
     }
 
     /**
+     * Called on custom DOM event "xdomchanged".
+     *
+     * @param _ Event object
+     *
+     * @since v1.3.1
+     */
+    // tslint:disable-next-line:no-any
+    protected onDomChanged(_: any) {
+        if (this.isElementSizeRelevant && this.riotTagInstance.isMounted) {
+            this.updateOriginalElementSizeData();
+        }
+    }
+
+    /**
      * riotjs.com: Listen to the given `event` and execute the `callback` at most
      * once.
      *
@@ -231,10 +257,17 @@ export abstract class RiotTag {
      * @since v1.0.0
      */
     public onMounted() {
-        if (this.isElementSizeRelevant
-            && (!this.originalElementData)
-           ) {
+        if (this.isElementSizeRelevant) {
             this.updateOriginalElementSizeData();
+        }
+
+        if (this.instanceClass.isDomManipulationAvailable) {
+            if ((!this.riotTagInstance.parent) || this.riotTagInstance.parent.isMounted) {
+                $(this.riotTagInstance.root).trigger('xdomchanged');
+            }
+
+            // tslint:disable-next-line:no-any
+            ($(self) as any).on(`xdomchanged.djt-riot-tag-${this.id}`, this.onAnyDomChanged);
         }
     }
 
@@ -245,7 +278,20 @@ export abstract class RiotTag {
      */
     // tslint:disable-next-line:no-any
     public onResize() {
-        this.updateOriginalElementSizeData();
+        if (this.riotTagInstance.isMounted) {
+            this.updateOriginalElementSizeData();
+        }
+    }
+
+    /**
+     * Called once for tag event "unmount".
+     *
+     * @since v1.0.0
+     */
+    public onUnmounted() {
+        if (!this.riotTagInstance.parent) {
+            $(self).trigger('xdomchanged');
+        }
     }
 
     /**
@@ -259,7 +305,7 @@ export abstract class RiotTag {
     public onWindowResized(event: any) {
         event.preventUpdate = true;
 
-        if (this.isElementSizeRelevant) {
+        if (this.isElementSizeRelevant && this.riotTagInstance.isMounted) {
             this.updateOriginalElementSizeData();
         }
     }
@@ -285,32 +331,6 @@ export abstract class RiotTag {
     // tslint:disable-next-line:no-any
     public trigger(event: string, ...args: any[]) {
         this.riotTagInstance.trigger(event, ...args);
-    }
-
-    /**
-     * riotjs.com: Execute all callback functions that listen to the given 'event'.
-     *
-     * @param event Event ID
-     *
-     * @since v1.3.0
-     */
-    // tslint:disable-next-line:no-any
-    public triggerOnSiblings(event: string, ...args: any[]) {
-        if (this.riotTagInstance.parent && this.riotTagInstance.parent.tags) {
-            for (const siblingTagName of Object.keys(this.riotTagInstance.parent.tags)) {
-                let siblingTags = this.riotTagInstance.parent.tags[siblingTagName];
-
-                if (!Array.isArray(siblingTags) && siblingTags) {
-                    siblingTags = [ siblingTags ];
-                }
-
-                for (const siblingTag of siblingTags) {
-                    if (siblingTag !== this.riotTagInstance) {
-                        siblingTag.trigger(event, ...args);
-                    }
-                }
-            }
-        }
     }
 
     /**
