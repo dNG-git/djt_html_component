@@ -71,7 +71,7 @@ export class DynamicHtmlContent extends RiotTag {
             this.content = content;
             util.dom.setInnerHTML(this.riotTagInstance.root, content);
 
-            this.triggerOnSiblings('resize');
+            $(this.riotTagInstance.root).trigger('xdomchanged');
         }
     }
 
