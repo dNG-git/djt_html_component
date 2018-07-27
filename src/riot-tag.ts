@@ -186,7 +186,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * Called once for tag event "before-mount".
+     * Called for tag event "before-mount".
      *
      * @since v1.0.0
      */
@@ -213,7 +213,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * Called once for tag event "before-unmount".
+     * Called for tag event "before-unmount".
      *
      * @since v1.3.1
      */
@@ -252,7 +252,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * Called once for tag event "mount".
+     * Called for tag event "mount".
      *
      * @since v1.0.0
      */
@@ -284,7 +284,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * Called once for tag event "unmount".
+     * Called for tag event "unmount".
      *
      * @since v1.0.0
      */
@@ -369,30 +369,47 @@ export abstract class RiotTag {
     protected updateOriginalElementSizeData() {
         const instanceClass = this.instanceClass;
 
-        if (instanceClass.isDomManipulationAvailable) {
-            if (!this.originalElementData) {
-                this.originalElementData = {
-                    name: instanceClass.tagName,
-                    value: '',
-                    attributes: { },
-                    children: [ ]
-                };
+        if (!this.originalElementData) {
+            this.originalElementData = {
+                name: instanceClass.tagName,
+                value: '',
+                attributes: { },
+                children: [ ]
+            };
+        }
+
+        let width = this.originalElementData.width;
+        let height = this.originalElementData.height;
+
+        if (width === undefined || height === undefined) {
+            const metrics = (
+                this.riotTagInstance.root.getBoundingClientRect
+                ? this.riotTagInstance.root.getBoundingClientRect() : { }
+            );
+
+            if ((!metrics.width) && instanceClass.isDomManipulationAvailable) {
+                // tslint:disable-next-line:no-any
+                const $element: any = $(this.riotTagInstance.root);
+
+                if (width === undefined) {
+                    width = $element.width();
+                }
+
+                if (height === undefined) {
+                    height = $element.height();
+                }
             }
 
-            // tslint:disable-next-line:no-any
-            const $element: any = $(this.riotTagInstance.root);
-
-            let width = this.originalElementData.width;
-            let height = this.originalElementData.height;
-
             if (width === undefined) {
-                width = $element.width();
+                width = metrics.width;
             }
 
             if (height === undefined) {
-                height = $element.height();
+                height = metrics.height;
             }
+        }
 
+        if (width !== undefined && height !== undefined) {
             this.update({
                 width: width,
                 height: height
