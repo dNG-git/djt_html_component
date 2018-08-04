@@ -230,8 +230,7 @@ export abstract class RiotTag {
      *
      * @since v1.3.1
      */
-    // tslint:disable-next-line:no-any
-    protected onDomChanged(_: any) {
+    protected onDomChanged(_: Event) {
         if (this.isElementSizeRelevant && this.riotTagInstance.isMounted) {
             this.updateOriginalElementSizeData();
         }
