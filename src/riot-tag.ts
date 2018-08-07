@@ -275,7 +275,6 @@ export abstract class RiotTag {
      *
      * @since v1.0.0
      */
-    // tslint:disable-next-line:no-any
     public onResize() {
         if (this.riotTagInstance.isMounted) {
             this.updateOriginalElementSizeData();
@@ -296,14 +295,11 @@ export abstract class RiotTag {
     /**
      * Called on DOM event "resize".
      *
-     * @param event Event object
+     * @param _ Event object
      *
      * @since v1.0.0
      */
-    // tslint:disable-next-line:no-any
-    public onWindowResized(event: any) {
-        event.preventUpdate = true;
-
+    public onWindowResized(_: Event) {
         if (this.isElementSizeRelevant && this.riotTagInstance.isMounted) {
             this.updateOriginalElementSizeData();
         }
@@ -462,7 +458,8 @@ export abstract class RiotTag {
      * @param callback Animation callback
      * @param timeout Additional time to wait in milliseconds
      *
-     * @since v1.0.0
+     * @return Scheduled animation ID
+     * @since  v1.0.0
      */
     public static animateLater(callback: (timestamp?: number) => void, timeout?: number) {
         let animationId;
@@ -487,7 +484,8 @@ export abstract class RiotTag {
      * @param element (X)HTML5 element or DOM selector
      * @param opts Riot.js tag options
      *
-     * @since v1.0.0
+     * @return Tag mounted
+     * @since  v1.0.0
      */
     public static attachAndMount(element?: Element | string, opts?: TagOpts) {
         if (!this.isRegistered) {
@@ -504,7 +502,8 @@ export abstract class RiotTag {
      * @param tagName Riot.js tag name to attach and mount
      * @param opts Riot.js tag options
      *
-     * @since v1.2.0
+     * @return Tag mounted
+     * @since  v1.2.0
      */
     public static attachTagNameAndMount(element: Element | string | undefined, tagName: string, opts?: TagOpts) {
         if (!element) {
@@ -648,7 +647,8 @@ export abstract class RiotTag {
      * @param element (X)HTML5 element or DOM selector
      * @param opts Riot.js tag options
      *
-     * @since v1.0.0
+     * @return Tag or array of tags mounted
+     * @since  v1.0.0
      */
     // tslint:disable-next-line:no-any
     public static mount(element?: Element | string, opts?: TagOpts): any {
@@ -736,13 +736,14 @@ export abstract class RiotTag {
     }
 
     /**
-     * Replaces all children of the given (X)HTML element and mount the tag
-     * name instead.
+     * Replaces all children of the given (X)HTML element and mounts the tag
+     * instead.
      *
      * @param element (X)HTML5 element or DOM selector
      * @param tagName Riot.js tag name to attach and mount
      * @param opts Riot.js tag options
      *
+     * @return Tag mounted
      * @since v1.2.0
      */
     public static replaceWithTagNameAndMount(element: Element | string, tagName: string, opts?: TagOpts) {
