@@ -32,7 +32,7 @@ export class DynamicHtmlContent extends RiotTag {
     protected content: string;
 
     /**
-     * Constructor (RiotTag)
+     * Constructor (DynamicHtmlContent)
      *
      * @param riotTagInstance Riot.js tag instance if mounted internally
      * @param opts Riot.js tag options
@@ -48,12 +48,9 @@ export class DynamicHtmlContent extends RiotTag {
 
         this.onUpdated = this.onUpdated.bind(this);
 
-        this.one('mount', this.onUpdated);
         this.on('updated', this.onUpdated);
 
-        this.update({
-            content: opts.content
-        });
+        this.update({ content: (opts.content ? opts.content : '') });
     }
 
     /**
@@ -82,7 +79,7 @@ export class DynamicHtmlContent extends RiotTag {
      * @since  v1.3.0
      */
     public static get tagName() {
-        return 'dynamic-html-content';
+        return 'djt-dynamic-html-content';
     }
 
     /**
