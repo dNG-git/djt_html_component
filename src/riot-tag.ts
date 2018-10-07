@@ -563,6 +563,10 @@ export abstract class RiotTag {
             _return.attributes[attribute.name] = attribute.value;
         }
 
+        if (!('class' in _return.attributes) && element.className) {
+            _return.attributes['class'] = element.className;
+        }
+
         const _class = this;
         const $elementNodes = $element.children();
 
@@ -780,7 +784,7 @@ export abstract class RiotTag {
             for (const key of Object.keys(modulesLoaded)) {
                 moduleLoaded = modulesLoaded[key];
 
-                if (RiotTag.prototype.isPrototypeOf(moduleLoaded)) {
+                if (moduleLoaded.prototype && RiotTag.prototype.isPrototypeOf(moduleLoaded.prototype)) {
                     // tslint:disable-next-line:no-any
                     (moduleLoaded as any).register();
                 }
