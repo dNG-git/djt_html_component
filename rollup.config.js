@@ -49,6 +49,7 @@ export default {
         TypeScript({ tsconfig: 'tsconfig.browser.json' }),
 
         CommonJs({
+            ignore: [ 'require' ],
             namedExports: {
                 'riot/riot.js': [ 'mount', 'tag', 'Tag', 'util' ],
                 'tslib': [ '__awaiter', '__extends', '__generator' ]

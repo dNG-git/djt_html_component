@@ -3,7 +3,7 @@
     "license": "MPL-2.0",
     "description": "'djt-xhtml5-riot-tag' adds additional common methods to Riot.js tags.",
     "homepage": "https://www.direct-netware.de/redirect?djt;xhtml5;riot_tag",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "private": true,
     "repository": {
         "type": "git",
@@ -24,7 +24,7 @@
     },
     "dependencies": {
         "djt-object-tree-lookup": "git://github.com/dNG-git/djt_object_tree_lookup.git#semver:^1.0.0",
-        "djt-promised-require": "git://github.com/dNG-git/djt_promised_require.git#semver:^1.1.0",
+        "djt-promised-require": "git://github.com/dNG-git/djt_promised_require.git#semver:^1.1.1",
         "riot": "^3.10.2",
         "zepto": "^1.2.0"
     },
