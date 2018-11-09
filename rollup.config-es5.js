@@ -17,12 +17,23 @@
 import { applyDefaultConfig } from './rollup.default';
 
 export default applyDefaultConfig({
-    inputTsConfig: 'tsconfig.browser-module.json',
+    inputResolveConfig: {
+        browser: true,
+        main: true,
+        jsnext: false,
+        module: false,
+        extensions: [ '.js', '.json', '.ts' ],
+        moduleOnly: true,
+        preferBuiltins: true
+    },
+
+    inputTsConfig: 'tsconfig.browser-es5.json',
 
     output: [
         {
-            file: 'dist/djt-xhtml5-riot-tag.js',
-            format: 'esm',
+            file: 'dist/es5/djt-xhtml5-riot-tag.js',
+            format: 'amd',
+            amd: { id: 'djt-xhtml5-riot-tag' },
             interop: false,
             sourcemap: true
         }
