@@ -265,8 +265,7 @@ export abstract class RiotTag {
                 $(this.riotTagInstance.root).trigger('xdomchanged');
             }
 
-            // tslint:disable-next-line:no-any
-            ($(self) as any).on(`xdomchanged.djt-riot-tag-${this.id}`, this.onAnyDomChanged);
+            $(self).on(`xdomchanged.djt-riot-tag-${this.id}`, this.onAnyDomChanged);
         }
     }
 
