@@ -517,7 +517,10 @@ export abstract class RiotTag {
             throw new Error('Parent DOM element not found');
         }
 
-        return util.tags.mountTo(element, tagName, opts);
+        const tagElement = util.dom.mkEl(tagName);
+        element.appendChild(tagElement);
+
+        return util.tags.mountTo(tagElement, tagName, opts);
     }
 
     /**
