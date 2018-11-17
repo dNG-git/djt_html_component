@@ -29,7 +29,14 @@ import { RiotTag } from './riot-tag';
  *            Mozilla Public License, v. 2.0
  */
 export class DynamicHtmlContent extends RiotTag {
+    /**
+     * (X)HTML5 content
+     */
     protected content: string;
+    /**
+     * Initial (X)HTML5 content given to constructor
+     */
+    protected initialContent: string;
 
     /**
      * Constructor (DynamicHtmlContent)
@@ -46,11 +53,25 @@ export class DynamicHtmlContent extends RiotTag {
             opts = { };
         }
 
+        this.initialContent = (opts.content ? opts.content : '');
+
         this.onUpdated = this.onUpdated.bind(this);
 
         this.on('updated', this.onUpdated);
 
-        this.update({ content: (opts.content ? opts.content : '') });
+        this.update({ content: '' });
+    }
+
+    /**
+     * Called once for tag event "mount".
+     *
+     * @since v2.3.0
+     */
+    public onMounted() {
+        super.onMounted();
+
+        this.update({ content: this.initialContent });
+        this.initialContent = undefined;
     }
 
     /**
