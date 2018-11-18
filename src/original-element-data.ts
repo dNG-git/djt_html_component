@@ -34,6 +34,10 @@ export interface OriginalElementData {
      */
     value: string;
     /**
+     * Element node inner HTML
+     */
+    html?: string;
+    /**
      * Element child nodes
      */
     children: OriginalElementData[];

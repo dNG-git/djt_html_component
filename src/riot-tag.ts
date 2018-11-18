@@ -432,6 +432,17 @@ export abstract class RiotTag {
     }
 
     /**
+     * Returns a list of node names "originalElementData" should provide the
+     * inner HTML content instead of being parsed.
+     *
+     * @return List of node names
+     * @since  v1.0.0
+     */
+    protected static get originalElementNodeNamesWithHtml(): string[] {
+        return [ ];
+    }
+
+    /**
      * riotjs.com: The tag name
      *
      * @return Riot.js custom tag name
@@ -551,7 +562,11 @@ export abstract class RiotTag {
      * @since  v1.0.0
      */
     // tslint:disable-next-line:no-any
-    protected static elementToDataWalker($element: any) {
+    protected static elementToDataWalker($element: any, nodeNamesWithInnerHtml?: string[]) {
+        if (!nodeNamesWithInnerHtml) {
+            nodeNamesWithInnerHtml = this.originalElementNodeNamesWithHtml;
+        }
+
         const element = $element.get(0);
 
         const _return: OriginalElementData = {
@@ -561,6 +576,10 @@ export abstract class RiotTag {
             children: [ ]
         };
 
+        if (_return.value !== null && nodeNamesWithInnerHtml.includes(_return.name)) {
+            _return['html'] = $element.html();
+        }
+
         for (const attribute of element.attributes) {
             _return.attributes[attribute.name] = attribute.value;
         }
@@ -569,13 +588,15 @@ export abstract class RiotTag {
             _return.attributes['class'] = element.className;
         }
 
-        const _class = this;
-        const $elementNodes = $element.children();
+        if (!('html' in _return)) {
+            const _class = this;
+            const $elementNodes = $element.children();
 
-        if ($elementNodes.length > 0) {
-            $elementNodes.each(function() {
-                _return.children.push(_class.elementToDataWalker($(this)));
-            });
+            if ($elementNodes.length > 0) {
+                $elementNodes.each(function() {
+                    _return.children.push(_class.elementToDataWalker($(this), nodeNamesWithInnerHtml));
+                });
+            }
         }
 
         return _return;
@@ -672,7 +693,17 @@ export abstract class RiotTag {
             element = this.tagName;
         }
 
-        const isDomElement = Element.prototype.isPrototypeOf(element);
+        let $element;
+        let isDomElement = Element.prototype.isPrototypeOf(element);
+
+        if (!isDomElement) {
+            $element = $(element);
+
+            if ($element.length === 1) {
+                element = $element.get(0);
+                isDomElement = Element.prototype.isPrototypeOf(element);
+            }
+        }
 
         if (isDomElement && '_tag' in Object.keys(element)) {
             // tslint:disable-next-line:no-any
@@ -687,7 +718,9 @@ export abstract class RiotTag {
             }
         } else {
             if (isDomElement && this.isDomManipulationAvailable && (!opts.originalElementData)) {
-                const $element = $(element);
+                if (!$element) {
+                    $element = $(element);
+                }
 
                 if ($element.length == 1) {
                     const data = this.elementToDataWalker($element);
