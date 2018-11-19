@@ -46,8 +46,6 @@ export function applyDefaultConfig(customConfig) {
         input: 'src/module.ts',
         output: customConfig.output,
 
-        context: 'this',
-
         plugins: [
             Resolve(resolveConfig),
 
@@ -56,7 +54,7 @@ export function applyDefaultConfig(customConfig) {
             CommonJs({
                 ignore: [ 'require' ],
                 namedExports: {
-                    'riot/riot.js': [ 'mount', 'tag', 'Tag', 'util' ],
+                    'riot/riot.js': [ 'mount', 'tag', 'util' ],
                     'tslib': [ '__awaiter', '__extends', '__generator' ]
                 }
             }),
