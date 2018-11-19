@@ -153,8 +153,7 @@ export abstract class RiotTag {
      *
      * @since v1.0.0
      */
-    // tslint:disable-next-line:no-any
-    public off(event: string, fn?: any) {
+    public off(event: string, fn?: unknown) {
         this.riotTagInstance.off(event, fn);
     }
 
@@ -167,8 +166,7 @@ export abstract class RiotTag {
      *
      * @since v1.0.0
      */
-    // tslint:disable-next-line:no-any
-    public on(event: string, fn: any) {
+    public on(event: string, fn: unknown) {
         this.riotTagInstance.on(event, fn);
     }
 
@@ -191,8 +189,7 @@ export abstract class RiotTag {
      * @since v1.0.0
      */
     public onBeforeMount() {
-        // tslint:disable-next-line:no-any
-        let $self: any;
+        let $self;
 
         if (this.isElementSizeRelevant) {
             this.on('resize', this.onResize);
@@ -245,8 +242,7 @@ export abstract class RiotTag {
      *
      * @since v1.0.0
      */
-    // tslint:disable-next-line:no-any
-    public one(event: string, fn: any) {
+    public one(event: string, fn: unknown) {
         this.riotTagInstance.one(event, fn);
     }
 
@@ -322,8 +318,7 @@ export abstract class RiotTag {
      *
      * @since v1.0.0
      */
-    // tslint:disable-next-line:no-any
-    public trigger(event: string, ...args: any[]) {
+    public trigger(event: string, ...args: Array<unknown>) {
         this.riotTagInstance.trigger(event, ...args);
     }
 
@@ -382,8 +377,7 @@ export abstract class RiotTag {
             );
 
             if ((!metrics.width) && instanceClass.isDomManipulationAvailable) {
-                // tslint:disable-next-line:no-any
-                const $element: any = $(this.riotTagInstance.root);
+                const $element = $(this.riotTagInstance.root);
 
                 if (width === undefined) {
                     width = $element.width();
@@ -677,8 +671,7 @@ export abstract class RiotTag {
      * @return Tag or array of tags mounted
      * @since  v1.0.0
      */
-    // tslint:disable-next-line:no-any
-    public static mount(element?: Element | string, opts?: TagOpts): any {
+    public static mount(element?: Element | string, opts?: TagOpts) {
         let _return;
 
         if (!this.isRegistered) {
@@ -763,10 +756,8 @@ export abstract class RiotTag {
                         opts = { };
                     }
 
-                    const riotTagInstance = this as Tag;
-
                     // tslint:disable-next-line
-                    new (instanceConstructor as any)(riotTagInstance, opts);
+                    new (instanceConstructor as any)(this, opts);
                 }
             );
 
