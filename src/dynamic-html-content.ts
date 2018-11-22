@@ -75,7 +75,7 @@ export class DynamicHtmlContent extends RiotTag {
     }
 
     /**
-     * riotjs.com: Right after the tag is updated.
+     * riot.js.org: Right after the tag is updated.
      *
      * @since v1.3.0
      */
@@ -94,22 +94,12 @@ export class DynamicHtmlContent extends RiotTag {
     }
 
     /**
-     * riotjs.com: The tag name
+     * riot.js.org: The tag name
      *
      * @return Riot.js custom tag name
      * @since  v1.3.0
      */
     public static get tagName() {
         return 'djt-dynamic-html-content';
-    }
-
-    /**
-     * riotjs.com: The layout with expressions
-     *
-     * @return Layout template
-     * @since  v1.3.0
-     */
-    protected static get tmpl() {
-        return '';
     }
 }
