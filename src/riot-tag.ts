@@ -135,7 +135,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: Mount the current tag instance
+     * riot.js.org: Mount the current tag instance
      *
      * @since v1.0.0
      */
@@ -146,7 +146,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: Removes the given 'event' listeners.
+     * riot.js.org: Removes the given 'event' listeners.
      *
      * @param event Event ID
      * @param fn Callback
@@ -158,8 +158,8 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: Listen to the given `event` ands execute the `callback` each time
-     * an event is triggered.
+     * riot.js.org: Listen to the given `event` ands execute the `callback` each
+     * time an event is triggered.
      *
      * @param event Event ID
      * @param fn Callback
@@ -234,7 +234,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: Listen to the given `event` and execute the `callback` at most
+     * riot.js.org: Listen to the given `event` and execute the `callback` at most
      * once.
      *
      * @param event Event ID
@@ -312,7 +312,8 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: Execute all callback functions that listen to the given 'event'.
+     * riot.js.org: Execute all callback functions that listen to the given
+     * 'event'.
      *
      * @param event Event ID
      *
@@ -323,7 +324,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: Unmount the tag instance
+     * riot.js.org: Unmount the tag instance
      *
      * @param mustKeepRoot If it's true the root node will not be removed
      *
@@ -339,7 +340,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: Update the tag expressions and options
+     * riot.js.org: Update the tag expressions and options
      *
      * @param data Data to be changed
      *
@@ -406,7 +407,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: String of attributes for the tag
+     * riot.js.org: String of attributes for the tag
      *
      * @return Node attributes
      * @since  v1.0.0
@@ -416,7 +417,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: The style for the tag
+     * riot.js.org: The style for the tag
      *
      * @return CSS style rules
      * @since  v1.0.0
@@ -437,7 +438,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: The tag name
+     * riot.js.org: The tag name
      *
      * @return Riot.js custom tag name
      * @since  v1.0.0
@@ -447,7 +448,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: The layout with expressions
+     * riot.js.org: The layout with expressions
      *
      * @return Layout template
      * @since  v1.0.0
@@ -622,6 +623,40 @@ export abstract class RiotTag {
     }
 
     /**
+     * Returns the requested Riot.js option from the attribute name or it's "data"
+     * attribute if applicable.
+     *
+     * @param opts Riot.js tag options
+     * @param name Option name
+     * @param defaultValue Default value returned if option is not found
+     *
+     * @return Option value
+     * @since  v2.5.0
+     */
+    // tslint:disable-next-line:no-any
+    protected static getOptFromAttribute(opts: TagOpts, name: string, defaultValue?: any) {
+        let _return;
+
+        if (opts) {
+            if (name in opts) {
+                _return = opts[name];
+            } else {
+                name = 'data' + name.charAt(0).toUpperCase() + name.slice(1);
+            }
+
+            if (_return === undefined && name in opts) {
+                _return = opts[name];
+            }
+        }
+
+        if (_return === undefined) {
+            _return = defaultValue;
+        }
+
+        return _return;
+    }
+
+    /**
      * Returns a random value usable as a DOM ID.
      *
      * @return Random value usable as DOM ID
@@ -663,7 +698,7 @@ export abstract class RiotTag {
     }
 
     /**
-     * riotjs.com: Mount the tag instance under the DOM element given
+     * riot.js.org: Mount the tag instance under the DOM element given
      *
      * @param element (X)HTML5 element or DOM selector
      * @param opts Riot.js tag options
