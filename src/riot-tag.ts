@@ -35,7 +35,8 @@ export abstract class RiotTag {
      * Milliseconds to wait before calling a requested animation callback if
      * "requestAnimationFrame()" is not available.
      */
-    protected static animationTimeoutValue = 25;
+    protected static readonly ANIMATION_DELAY_MS = 25;
+
     /**
      * Flag indicating that a DOM manipulation library is available
      */
@@ -469,15 +470,19 @@ export abstract class RiotTag {
     public static animateLater(callback: (timestamp?: number) => void, timeout?: number) {
         let animationId;
 
-        if (this.isRequestAnimationFrameAvailable && timeout === undefined) {
-            animationId =  self.requestAnimationFrame(callback);
-        } else {
-            if (this.isRequestAnimationFrameAvailable) {
+        if (this.isRequestAnimationFrameAvailable) {
+            if (timeout === undefined) {
+                animationId = self.requestAnimationFrame(callback);
+            } else {
                 const originalCallback = callback;
                 callback = () => { self.requestAnimationFrame(originalCallback); };
             }
+        }
 
-            animationId = { timeoutId: self.setTimeout(callback, timeout) };
+        if (animationId === undefined) {
+            animationId = {
+                timeoutId: self.setTimeout(callback, (timeout === undefined ? this.ANIMATION_DELAY_MS : timeout))
+            };
         }
 
         return animationId;
