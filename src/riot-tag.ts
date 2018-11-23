@@ -19,6 +19,7 @@ import PromisedRequire from 'djt-promised-require';
 import { mount, tag, Tag, TagOpts, util } from 'riot';
 
 import { OriginalElementData } from './original-element-data';
+import { ScheduledAnimationIdType } from './types';
 
 /**
  * Abstract Riot.js tag class supporting tag registration.
@@ -541,7 +542,7 @@ export abstract class RiotTag {
      *
      * @since v1.0.0
      */
-    public static cancelAnimateLater(animationId: number | { timeoutId: number }) {
+    public static cancelAnimateLater(animationId: ScheduledAnimationIdType) {
         if (this.isRequestAnimationFrameAvailable && typeof animationId == 'number') {
             self.cancelAnimationFrame(animationId);
         } else {
