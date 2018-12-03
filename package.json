@@ -3,7 +3,7 @@
     "license": "MPL-2.0",
     "description": "'djt-xhtml5-riot-tag' adds additional common methods to Riot.js tags.",
     "homepage": "https://www.direct-netware.de/redirect?djt;xhtml5;riot_tag",
-    "version": "2.5.1",
+    "version": "3.0.0",
     "private": true,
     "repository": {
         "type": "git",

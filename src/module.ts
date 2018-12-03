@@ -16,6 +16,7 @@
 
 import * as riot from 'riot';
 
+export { DomUtilities } from './dom-utilities';
 export { DynamicHtmlContent } from './dynamic-html-content';
 export { OriginalElementData } from './original-element-data';
 export { RiotTag } from './riot-tag';

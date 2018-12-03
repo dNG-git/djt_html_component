@@ -14,12 +14,11 @@
  * @license Mozilla Public License, v. 2.0
  */
 
-import ObjectTreeLookup from 'djt-object-tree-lookup';
 import PromisedRequire from 'djt-promised-require';
 import { mount, tag, Tag, TagOpts, util } from 'riot';
 
+import { DomUtilities } from './dom-utilities';
 import { OriginalElementData } from './original-element-data';
-import { ScheduledAnimationIdType } from './types';
 
 /**
  * Abstract Riot.js tag class supporting tag registration.
@@ -33,19 +32,10 @@ import { ScheduledAnimationIdType } from './types';
  */
 export abstract class RiotTag {
     /**
-     * Milliseconds to wait before calling a requested animation callback if
-     * "requestAnimationFrame()" is not available.
+     * Milliseconds to wait after the UI DOM event occurred before callbacks are executed.
      */
-    protected static readonly ANIMATION_DELAY_MS = 25;
+    protected static readonly DOM_UI_CHANGE_DELAY_MS = 85;
 
-    /**
-     * Flag indicating that a DOM manipulation library is available
-     */
-    public static isDomManipulationAvailable: boolean = undefined;
-    /**
-     * Flag indicating that the client supports "requestAnimationFrame()"
-     */
-    protected static _isRequestAnimationFrameAvailable: boolean = undefined;
     /**
      * Flag indicating that the tag name has been registered
      */
@@ -59,11 +49,11 @@ export abstract class RiotTag {
      * Flag indicating that the instance is interested in the size of the
      * (X)HTML5 element.
      */
-    protected isElementSizeRelevant = false;
+    protected _isElementSizeRelevant = false;
     /**
      * Flag indicating that the instance is interested in window resize events.
      */
-    protected isWindowResizeRelevant = false;
+    protected _isWindowResizeRelevant = false;
     /**
      * Original DOM element and child data like attributes and values.
      */
@@ -83,10 +73,6 @@ export abstract class RiotTag {
      * @since v1.0.0
      */
     constructor(riotTagInstance: Tag, opts?: TagOpts) {
-        if (this.instanceClass.isDomManipulationAvailable === undefined) {
-            this.instanceClass.validateDomManipulationSupport();
-        }
-
         this.riotTagInstance = riotTagInstance;
 
         if (!opts) {
@@ -97,19 +83,19 @@ export abstract class RiotTag {
             this.originalElementData = opts.originalElementData;
         }
 
-        this.id = (ObjectTreeLookup.exists(opts, 'id') ? opts.id : undefined);
+        this.id = this.instanceClass.getOptFromAttribute(opts, 'id', '');
 
-        if (this.id === undefined && ObjectTreeLookup.exists(this.originalElementData, 'attributes.data-id')) {
-            this.id = this.originalElementData.attributes['data-id'];
+        if (typeof this.id != 'string') {
+            this.id = '';
         }
 
-        if (this.id === undefined) {
+        if (this.id == '' && this.originalElementData) {
+            this.id = this.instanceClass.getOptFromAttribute(this.originalElementData.attributes, 'id', '');
+        }
+
+        if (this.id == '') {
             this.id = this.instanceClass.getRandomDomId();
         }
-
-        this.isWindowResizeRelevant = (
-            'listenForWindowResize' in opts && opts.listenForWindowResize != false
-        );
 
         this.onAnyDomChanged = this.onAnyDomChanged.bind(this);
         this.onBeforeMount = this.onBeforeMount.bind(this);
@@ -119,6 +105,11 @@ export abstract class RiotTag {
         this.onUnmounted = this.onUnmounted.bind(this);
         this.onWindowResized = this.onWindowResized.bind(this);
         this.onWindowUnload = this.onWindowUnload.bind(this);
+        this.updateTagSize = this.updateTagSize.bind(this);
+
+        this.isWindowResizeRelevant = (
+            'listenForWindowResize' in opts && opts.listenForWindowResize != false
+        );
 
         this.on('before-mount', this.onBeforeMount);
         this.on('before-unmount', this.onBeforeUnmount);
@@ -134,6 +125,77 @@ export abstract class RiotTag {
      */
     protected get instanceClass() {
         return Object.getPrototypeOf(this).constructor;
+    }
+
+    /**
+     * Returns true if that the instance is interested in the size of the
+     * (X)HTML5 element.
+     *
+     * @return True if (X)HTML5 element size is relevant
+     * @since  v3.0.0
+     */
+    public get isElementSizeRelevant() {
+        return this._isElementSizeRelevant;
+    }
+
+    /**
+     * Sets the flag indicating if that the instance is interested in the size of
+     * the (X)HTML5 element.
+     *
+     * @param value True if (X)HTML5 element size is relevant
+     *
+     * @since v3.0.0
+     */
+    public set isElementSizeRelevant(value) {
+        value = Boolean(value);
+
+        if (this._isElementSizeRelevant !== value) {
+            if (value) {
+                this.on('resize', this.onResize);
+
+                if (this.riotTagInstance.isMounted) {
+                    DomUtilities.animateLater(this.updateTagSize);
+                }
+            } else {
+                this.off('resize', this.onResize);
+            }
+
+            this._isElementSizeRelevant = value;
+        }
+    }
+
+    /**
+     * Returns true if that the instance is interested in window resize events.
+     *
+     * @return True if window resize events are relevant
+     * @since  v3.0.0
+     */
+    public get isWindowResizeRelevant() {
+        return this._isWindowResizeRelevant;
+    }
+
+    /**
+     * Sets the flag indicating that the instance is interested in window resize
+     * events.
+     *
+     * @param value True if window resize events are relevant
+     *
+     * @since v3.0.0
+     */
+    public set isWindowResizeRelevant(value) {
+        value = Boolean(value);
+
+        if (DomUtilities.isDomManipulationAvailable && this._isWindowResizeRelevant !== value) {
+            const $self = $(self);
+
+            if (value) {
+                $self.on(`resize.djt-riot-tag-${this.id}`, this.onWindowResized);
+            } else {
+                $self.off(`resize.djt-riot-tag-${this.id}`, this.onWindowResized);
+            }
+
+            this._isWindowResizeRelevant = value;
+        }
     }
 
     /**
@@ -193,16 +255,7 @@ export abstract class RiotTag {
     public onBeforeMount() {
         let $self;
 
-        if (this.isElementSizeRelevant) {
-            this.on('resize', this.onResize);
-
-            if (this.instanceClass.isDomManipulationAvailable && this.isWindowResizeRelevant) {
-                $self = $(self);
-                $self.on(`resize.djt-riot-tag-${this.id}`, this.onWindowResized);
-            }
-        }
-
-        if (this.instanceClass.isDomManipulationAvailable) {
+        if (DomUtilities.isDomManipulationAvailable) {
             if ($self === undefined) {
                 $self = $(self);
             }
@@ -217,9 +270,11 @@ export abstract class RiotTag {
      * @since v1.3.1
      */
     public onBeforeUnmount() {
+        this.isElementSizeRelevant = false;
+        this.isWindowResizeRelevant = false;
+
         $(this.riotTagInstance.root).off(`.djt-riot-tag-${this.id}`);
         $(self).off(`.djt-riot-tag-${this.id}`);
-        this.off('resize');
     }
 
     /**
@@ -231,7 +286,7 @@ export abstract class RiotTag {
      */
     protected onDomChanged(_: Event) {
         if (this.isElementSizeRelevant && this.riotTagInstance.isMounted) {
-            this.updateOriginalElementSizeData();
+            DomUtilities.animateLater(this.updateTagSize);
         }
     }
 
@@ -255,10 +310,10 @@ export abstract class RiotTag {
      */
     public onMounted() {
         if (this.isElementSizeRelevant) {
-            this.updateOriginalElementSizeData();
+            this.updateTagSize();
         }
 
-        if (this.instanceClass.isDomManipulationAvailable) {
+        if (DomUtilities.isDomManipulationAvailable) {
             if ((!this.riotTagInstance.parent) || this.riotTagInstance.parent.isMounted) {
                 $(this.riotTagInstance.root).trigger('xdomchanged');
             }
@@ -270,11 +325,16 @@ export abstract class RiotTag {
     /**
      * Called for tag event "resize".
      *
+     * @param uiSettled True if the DOM based UI is known to already have changed
+     *
      * @since v1.0.0
      */
-    public onResize() {
-        if (this.riotTagInstance.isMounted) {
-            this.updateOriginalElementSizeData();
+    public onResize(uiSettled = false) {
+        if (this.isElementSizeRelevant && this.riotTagInstance.isMounted) {
+            DomUtilities.animateLater(
+                this.updateTagSize,
+                (uiSettled ? undefined : this.instanceClass.DOM_UI_CHANGE_DELAY_MS)
+            );
         }
     }
 
@@ -298,7 +358,7 @@ export abstract class RiotTag {
      */
     public onWindowResized(_: Event) {
         if (this.isElementSizeRelevant && this.riotTagInstance.isMounted) {
-            this.updateOriginalElementSizeData();
+            DomUtilities.animateLater(this.updateTagSize);
         }
     }
 
@@ -354,16 +414,14 @@ export abstract class RiotTag {
     }
 
     /**
-     * Updates the original element size.
+     * Updates the underlying tag element size.
      *
      * @since v1.0.0
      */
-    protected updateOriginalElementSizeData() {
-        const instanceClass = this.instanceClass;
-
+    protected updateTagSize() {
         if (!this.originalElementData) {
             this.originalElementData = {
-                name: instanceClass.tagName,
+                name: this.instanceClass.tagName,
                 value: '',
                 attributes: { },
                 children: [ ]
@@ -379,7 +437,7 @@ export abstract class RiotTag {
                 ? this.riotTagInstance.root.getBoundingClientRect() : { }
             );
 
-            if ((!metrics.width) && instanceClass.isDomManipulationAvailable) {
+            if ((!metrics.width) && DomUtilities.isDomManipulationAvailable) {
                 const $element = $(this.riotTagInstance.root);
 
                 if (width === undefined) {
@@ -402,8 +460,8 @@ export abstract class RiotTag {
 
         if (width !== undefined && height !== undefined) {
             this.update({
-                width: width,
-                height: height
+                width: (width ? width : undefined),
+                height: (height ? height : undefined)
             });
         }
     }
@@ -460,36 +518,6 @@ export abstract class RiotTag {
     }
 
     /**
-     * Schedule an given animation callback.
-     *
-     * @param callback Animation callback
-     * @param timeout Additional time to wait in milliseconds
-     *
-     * @return Scheduled animation ID
-     * @since  v1.0.0
-     */
-    public static animateLater(callback: (timestamp?: number) => void, timeout?: number) {
-        let animationId;
-
-        if (this.isRequestAnimationFrameAvailable) {
-            if (timeout === undefined) {
-                animationId = self.requestAnimationFrame(callback);
-            } else {
-                const originalCallback = callback;
-                callback = () => { self.requestAnimationFrame(originalCallback); };
-            }
-        }
-
-        if (animationId === undefined) {
-            animationId = {
-                timeoutId: self.setTimeout(callback, (timeout === undefined ? this.ANIMATION_DELAY_MS : timeout))
-            };
-        }
-
-        return animationId;
-    }
-
-    /**
      * Attach the tag to the given (X)HTML element and mount it.
      *
      * @param element (X)HTML5 element or DOM selector
@@ -536,25 +564,6 @@ export abstract class RiotTag {
     }
 
     /**
-     * Cancel an scheduled animation callback.
-     *
-     * @param animationId Animation ID given by "animateLater()"
-     *
-     * @since v1.0.0
-     */
-    public static cancelAnimateLater(animationId: ScheduledAnimationIdType) {
-        if (this.isRequestAnimationFrameAvailable && typeof animationId == 'number') {
-            self.cancelAnimationFrame(animationId);
-        } else {
-            if (typeof animationId != 'number') {
-                animationId = animationId.timeoutId;
-            }
-
-            self.clearTimeout(animationId);
-        }
-    }
-
-    /**
      * Returns an properties object for the given $DOM element and its children.
      *
      * @param $element $DOM element
@@ -581,8 +590,11 @@ export abstract class RiotTag {
             _return['html'] = $element.html();
         }
 
-        for (const attribute of element.attributes) {
-            _return.attributes[attribute.name] = attribute.value;
+        const attributes = element.attributes;
+
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < attributes.length; i++) {
+            _return.attributes[attributes[i].name] = attributes[i].value;
         }
 
         if (!('class' in _return.attributes) && element.className) {
@@ -601,31 +613,6 @@ export abstract class RiotTag {
         }
 
         return _return;
-    }
-
-    /**
-     * Returns the given hexadecimal value as a number if possible.
-     *
-     * @param value hexadecimal value
-     *
-     * @return Value as number; undefined otherwise
-     * @since  v1.0.0
-     */
-    protected static getHexValueAsNumber(value: string) {
-        let numberValue: number;
-
-        if (typeof value == 'string') {
-            if (value[0] == '#') {
-                value = value.substr(1);
-            } else if (value.substr(0, 2) == '0x') {
-                value = value.substr(2);
-            }
-        }
-
-        numberValue = parseInt(value, 16);
-        if (isNaN(numberValue)) { numberValue = undefined; }
-
-        return numberValue;
     }
 
     /**
@@ -673,34 +660,23 @@ export abstract class RiotTag {
     }
 
     /**
-     * Returns the given value as a number if possible.
+     * Returns the Riot.js tag instance under the DOM element given.
      *
-     * @param value Decimal value
+     * @param element (X)HTML5 element
      *
-     * @return Value as number; undefined otherwise
-     * @since  v1.0.0
+     * @return Riot.js tag
+     * @since  v3.0.0
      */
-    protected static getValueAsNumber(value: string) {
-        let numberValue: number;
+    protected static getTag(element: Element) {
+        let _return;
 
-        numberValue = parseInt(value, 10);
-        if (isNaN(numberValue)) { numberValue = undefined; }
-
-        return numberValue;
-    }
-
-    /**
-     * Returns if the client supports the "requestAnimationFrame()" method.
-     *
-     * @return True if the client supports "requestAnimationFrame()"
-     * @since  v1.0.0
-     */
-    public static get isRequestAnimationFrameAvailable() {
-        if (this._isRequestAnimationFrameAvailable === undefined) {
-            this.validateRequestAnimationFrameSupport();
+        // tslint:disable-next-line:no-any
+        if (element && (element as any)._tag) {
+            // tslint:disable-next-line:no-any
+            _return = (element as any)._tag;
         }
 
-        return this._isRequestAnimationFrameAvailable;
+        return _return;
     }
 
     /**
@@ -728,18 +704,19 @@ export abstract class RiotTag {
         }
 
         let $element;
-        let isDomElement = Element.prototype.isPrototypeOf(element);
+        let isDomElement = (element instanceof Element);
 
         if (!isDomElement) {
             $element = $(element);
 
             if ($element.length === 1) {
                 element = $element.get(0);
-                isDomElement = Element.prototype.isPrototypeOf(element);
+                isDomElement = (element instanceof Element);
             }
         }
 
-        if (isDomElement && '_tag' in Object.keys(element)) {
+        // tslint:disable-next-line:no-any
+        if (isDomElement && (element as any)._tag) {
             // tslint:disable-next-line:no-any
             _return = (element as any)._tag;
 
@@ -751,15 +728,15 @@ export abstract class RiotTag {
                 _return.update(opts);
             }
         } else {
-            if (isDomElement && this.isDomManipulationAvailable && (!opts.originalElementData)) {
+            if (isDomElement && DomUtilities.isDomManipulationAvailable && (!opts.originalElementData)) {
                 if (!$element) {
                     $element = $(element);
                 }
 
                 if ($element.length == 1) {
                     const data = this.elementToDataWalker($element);
-                    data['width'] = this.getValueAsNumber(data.attributes['data-width']);
-                    data['height'] = this.getValueAsNumber(data.attributes['data-height']);
+                    data['width'] = DomUtilities.getValueAsNumber(data.attributes['data-width']);
+                    data['height'] = DomUtilities.getValueAsNumber(data.attributes['data-height']);
 
                     opts.originalElementData = data;
                 }
@@ -778,10 +755,6 @@ export abstract class RiotTag {
      * @since v1.0.0
      */
     public static register() {
-        if (this.isDomManipulationAvailable === undefined) {
-            this.validateDomManipulationSupport();
-        }
-
         if (!this.isRegistered) {
             this.isRegistered = true;
 
@@ -851,7 +824,7 @@ export abstract class RiotTag {
             for (const key of Object.keys(modulesLoaded)) {
                 moduleLoaded = modulesLoaded[key];
 
-                if (moduleLoaded.prototype && RiotTag.prototype.isPrototypeOf(moduleLoaded.prototype)) {
+                if (Object.getPrototypeOf(RiotTag).isPrototypeOf(moduleLoaded)) {
                     // tslint:disable-next-line:no-any
                     (moduleLoaded as any).register();
                 }
@@ -859,23 +832,5 @@ export abstract class RiotTag {
 
             return modulesLoaded;
         });
-    }
-
-    /**
-     * Validates if a DOM manipulation library is available.
-     *
-     * @since v1.0.0
-     */
-    protected static validateDomManipulationSupport() {
-        this.isDomManipulationAvailable = (typeof $ != 'undefined');
-    }
-
-    /**
-     * Validates if the client supports the "requestAnimationFrame()" method.
-     *
-     * @since v1.0.0
-     */
-    protected static validateRequestAnimationFrameSupport() {
-        this._isRequestAnimationFrameAvailable = ('requestAnimationFrame' in self);
     }
 }
