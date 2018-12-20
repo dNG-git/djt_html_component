@@ -1,13 +1,13 @@
 {
-    "name": "djt-xhtml5-riot-tag",
+    "name": "djt-html-riot-tag",
     "license": "MPL-2.0",
-    "description": "'djt-xhtml5-riot-tag' adds additional common methods to Riot.js tags.",
-    "homepage": "https://www.direct-netware.de/redirect?djt;xhtml5;riot_tag",
+    "description": "'djt-html-riot-tag' adds additional common methods to Riot.js tags.",
+    "homepage": "https://www.direct-netware.de/redirect?djt;html;riot_tag",
     "version": "3.0.0",
     "private": true,
     "repository": {
         "type": "git",
-        "url": "https://github.com/dNG-git/djt_xhtml5_riot_tag.git"
+        "url": "https://github.com/dNG-git/djt_html_riot_tag.git"
     },
     "main": "./lib/cjs/module.js",
     "module": "./lib/module.js",

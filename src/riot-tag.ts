@@ -3,7 +3,7 @@
  * All-in-one toolbox to provide more reusable JavaScript features
  *
  * (C) direct Netware Group - All rights reserved
- * https://www.direct-netware.de/redirect?djt;xhtml5;riot_tag
+ * https://www.direct-netware.de/redirect?djt;html;riot_tag
  *
  * This Source Code Form is subject to the terms of the Mozilla Public License,
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
@@ -25,7 +25,7 @@ import { OriginalElementData } from './original-element-data';
  *
  * @author    direct Netware Group
  * @copyright (C) direct Netware Group - All rights reserved
- * @package   djt-xhtml5-riot-tag
+ * @package   djt-html-riot-tag
  * @since     v1.0.0
  * @license   https://www.direct-netware.de/redirect?licenses;mpl2
  *            Mozilla Public License, v. 2.0
@@ -132,7 +132,7 @@ export abstract class RiotTag {
      * (X)HTML5 element.
      *
      * @return True if (X)HTML5 element size is relevant
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     public get isElementSizeRelevant() {
         return this._isElementSizeRelevant;
@@ -144,7 +144,7 @@ export abstract class RiotTag {
      *
      * @param value True if (X)HTML5 element size is relevant
      *
-     * @since v3.0.0
+     * @since v1.0.0
      */
     public set isElementSizeRelevant(value) {
         value = Boolean(value);
@@ -168,7 +168,7 @@ export abstract class RiotTag {
      * Returns true if that the instance is interested in window resize events.
      *
      * @return True if window resize events are relevant
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     public get isWindowResizeRelevant() {
         return this._isWindowResizeRelevant;
@@ -180,7 +180,7 @@ export abstract class RiotTag {
      *
      * @param value True if window resize events are relevant
      *
-     * @since v3.0.0
+     * @since v1.0.0
      */
     public set isWindowResizeRelevant(value) {
         value = Boolean(value);
@@ -239,7 +239,7 @@ export abstract class RiotTag {
      *
      * @param event Event object
      *
-     * @since v1.3.1
+     * @since v1.0.0
      */
     public onAnyDomChanged(event: Event) {
         if (event.target !== this.riotTagInstance.root) {
@@ -267,7 +267,7 @@ export abstract class RiotTag {
     /**
      * Called for tag event "before-unmount".
      *
-     * @since v1.3.1
+     * @since v1.0.0
      */
     public onBeforeUnmount() {
         this.isElementSizeRelevant = false;
@@ -282,7 +282,7 @@ export abstract class RiotTag {
      *
      * @param _ Event object
      *
-     * @since v1.3.1
+     * @since v1.0.0
      */
     protected onDomChanged(_: Event) {
         if (this.isElementSizeRelevant && this.riotTagInstance.isMounted) {
@@ -542,7 +542,7 @@ export abstract class RiotTag {
      * @param opts Riot.js tag options
      *
      * @return Tag mounted
-     * @since  v1.2.0
+     * @since  v1.0.0
      */
     public static attachTagNameAndMount(element: Element | string | undefined, tagName: string, opts?: TagOpts) {
         if (!element) {
@@ -624,7 +624,7 @@ export abstract class RiotTag {
      * @param defaultValue Default value returned if option is not found
      *
      * @return Option value
-     * @since  v2.5.0
+     * @since  v1.0.0
      */
     // tslint:disable-next-line:no-any
     protected static getOptFromAttribute(opts: TagOpts, name: string, defaultValue?: any) {
@@ -665,7 +665,7 @@ export abstract class RiotTag {
      * @param element (X)HTML5 element
      *
      * @return Riot.js tag
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     protected static getTag(element: Element) {
         let _return;
@@ -788,7 +788,7 @@ export abstract class RiotTag {
      * @param opts Riot.js tag options
      *
      * @return Tag mounted
-     * @since v1.2.0
+     * @since  v1.0.0
      */
     public static replaceWithTagNameAndMount(element: Element | string, tagName: string, opts?: TagOpts) {
         if (typeof element == "string") {
@@ -824,7 +824,7 @@ export abstract class RiotTag {
             for (const key of Object.keys(modulesLoaded)) {
                 moduleLoaded = modulesLoaded[key];
 
-                if (Object.getPrototypeOf(RiotTag).isPrototypeOf(moduleLoaded)) {
+                if (RiotTag.prototype.isPrototypeOf(moduleLoaded.prototype)) {
                     // tslint:disable-next-line:no-any
                     (moduleLoaded as any).register();
                 }

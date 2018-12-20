@@ -3,7 +3,7 @@
  * All-in-one toolbox to provide more reusable JavaScript features
  *
  * (C) direct Netware Group - All rights reserved
- * https://www.direct-netware.de/redirect?djt;xhtml5;riot_tag
+ * https://www.direct-netware.de/redirect?djt;html;riot_tag
  *
  * This Source Code Form is subject to the terms of the Mozilla Public License,
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
@@ -23,8 +23,8 @@ import { RiotTag } from './riot-tag';
  *
  * @author    direct Netware Group
  * @copyright (C) direct Netware Group - All rights reserved
- * @package   djt-xhtml5-riot-tag
- * @since     v1.3.0
+ * @package   djt-html-riot-tag
+ * @since     v1.0.0
  * @license   https://www.direct-netware.de/redirect?licenses;mpl2
  *            Mozilla Public License, v. 2.0
  */
@@ -44,7 +44,7 @@ export class DynamicHtmlContent extends RiotTag {
      * @param riotTagInstance Riot.js tag instance if mounted internally
      * @param opts Riot.js tag options
      *
-     * @since v1.3.0
+     * @since v1.0.0
      */
     constructor(riotTagInstance: Tag, opts?: TagOpts) {
         super(riotTagInstance, opts);
@@ -65,7 +65,7 @@ export class DynamicHtmlContent extends RiotTag {
     /**
      * Called once for tag event "mount".
      *
-     * @since v2.3.0
+     * @since v1.0.0
      */
     public onMounted() {
         super.onMounted();
@@ -77,7 +77,7 @@ export class DynamicHtmlContent extends RiotTag {
     /**
      * riot.js.org: Right after the tag is updated.
      *
-     * @since v1.3.0
+     * @since v1.0.0
      */
     public onUpdated() {
         const content = (
@@ -97,7 +97,7 @@ export class DynamicHtmlContent extends RiotTag {
      * riot.js.org: The tag name
      *
      * @return Riot.js custom tag name
-     * @since  v1.3.0
+     * @since  v1.0.0
      */
     public static get tagName() {
         return 'djt-dynamic-html-content';

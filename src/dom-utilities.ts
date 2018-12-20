@@ -3,7 +3,7 @@
  * All-in-one toolbox to provide more reusable JavaScript features
  *
  * (C) direct Netware Group - All rights reserved
- * https://www.direct-netware.de/redirect?djt;xhtml5;riot_tag
+ * https://www.direct-netware.de/redirect?djt;html;riot_tag
  *
  * This Source Code Form is subject to the terms of the Mozilla Public License,
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
@@ -21,8 +21,8 @@ import { ScheduledAnimationIdType } from './types';
  *
  * @author    direct Netware Group
  * @copyright (C) direct Netware Group - All rights reserved
- * @package   djt-xhtml5-riot-tag
- * @since     v3.0.0
+ * @package   djt-html-riot-tag
+ * @since     v1.0.0
  * @license   https://www.direct-netware.de/redirect?licenses;mpl2
  *            Mozilla Public License, v. 2.0
  */
@@ -46,7 +46,7 @@ export class DomUtilities {
      * Returns if a DOM manipulation library is available.
      *
      * @return True if a DOM manipulation library is available
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     public static get isDomManipulationAvailable() {
         if (this._isDomManipulationAvailable === undefined) {
@@ -60,7 +60,7 @@ export class DomUtilities {
      * Returns if the client supports the "requestAnimationFrame()" method.
      *
      * @return True if the client supports "requestAnimationFrame()"
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     public static get isRequestAnimationFrameAvailable() {
         if (this._isRequestAnimationFrameAvailable === undefined) {
@@ -77,7 +77,7 @@ export class DomUtilities {
      * @param timeout Additional time to wait in milliseconds
      *
      * @return Scheduled animation ID
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     public static animateLater(callback: (timestamp?: number) => void, timeout?: number) {
         let animationId;
@@ -105,7 +105,7 @@ export class DomUtilities {
      *
      * @param animationId Animation ID given by "animateLater()"
      *
-     * @since v3.0.0
+     * @since v1.0.0
      */
     public static cancelAnimateLater(animationId: ScheduledAnimationIdType) {
         if (this.isRequestAnimationFrameAvailable && typeof animationId == 'number') {
@@ -125,7 +125,7 @@ export class DomUtilities {
      * @param value hexadecimal value
      *
      * @return Value as number; undefined otherwise
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     public static getHexValueAsNumber(value: string) {
         let numberValue: number;
@@ -150,7 +150,7 @@ export class DomUtilities {
      * @param value Float value
      *
      * @return Float value as number; undefined otherwise
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     public static getValueAsFloatNumber(value: string) {
         let numberValue: number;
@@ -167,7 +167,7 @@ export class DomUtilities {
      * @param value Decimal value
      *
      * @return Value as number; undefined otherwise
-     * @since  v3.0.0
+     * @since  v1.0.0
      */
     public static getValueAsNumber(value: string) {
         let numberValue: number;
@@ -190,7 +190,7 @@ export class DomUtilities {
     /**
      * Validates if the client supports the "requestAnimationFrame()" method.
      *
-     * @since v3.0.0
+     * @since v1.0.0
      */
     protected static validateRequestAnimationFrameSupport() {
         this._isRequestAnimationFrameAvailable = ('requestAnimationFrame' in self);
