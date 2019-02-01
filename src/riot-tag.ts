@@ -458,7 +458,10 @@ export abstract class RiotTag {
             }
         }
 
-        if (width !== undefined && height !== undefined) {
+        if (
+            width !== undefined && height !== undefined
+            && (width != this.riotTagInstance.width || height != this.riotTagInstance.height)
+        ) {
             this.update({
                 width: (width ? width : undefined),
                 height: (height ? height : undefined)
