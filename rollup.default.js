@@ -3,7 +3,7 @@
  * All-in-one toolbox to provide more reusable JavaScript features
  *
  * (C) direct Netware Group - All rights reserved
- * https://www.direct-netware.de/redirect?djt;html;riot_tag
+ * https://www.direct-netware.de/redirect?djt;html;component
  *
  * This Source Code Form is subject to the terms of the Mozilla Public License,
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
@@ -14,23 +14,18 @@
  * @license Mozilla Public License, v. 2.0
  */
 
-import CommonJs from 'rollup-plugin-commonjs';
-import Resolve from 'rollup-plugin-node-resolve';
-import { terser as Terser } from 'rollup-plugin-terser';
-import TypeScript from 'rollup-plugin-typescript2';
+import commonjs from '@rollup/plugin-commonjs';
+import nodeResolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
+import { terser } from 'rollup-plugin-terser';
+import typescript from '@rollup/plugin-typescript';
 
 export function applyDefaultConfig(customConfig) {
     const resolveConfig = (
         customConfig.inputResolveConfig ?
-        customConfig.inputResolveConfig :
-        {
-            browser: true,
-            main: true,
-            jsnext: true,
-            module: true,
-            extensions: [ '.js', '.json', '.ts' ],
-            moduleOnly: true,
-            preferBuiltins: true
+        customConfig.inputResolveConfig : {
+            extensions: [ '.mjs', '.js', '.json' ],
+            mainFields: [ 'module', 'jsnext:main', 'jsnext', 'browser', 'main' ]
         }
     );
 
@@ -46,20 +41,18 @@ export function applyDefaultConfig(customConfig) {
         input: 'src/module.ts',
         output: customConfig.output,
 
+        inlineDynamicImports: true,
+
         plugins: [
-            Resolve(resolveConfig),
+            replace({ 'process.env.NODE_ENV': "'production'" }),
 
-            TypeScript({ tsconfig: customConfig.inputTsConfig }),
+            typescript({ tsconfig: customConfig.inputTsConfig }),
 
-            CommonJs({
-                ignore: [ 'require' ],
-                namedExports: {
-                    'riot/riot.js': [ 'mount', 'tag', 'util' ],
-                    'tslib': [ '__awaiter', '__extends', '__generator' ]
-                }
-            }),
+            nodeResolve(resolveConfig),
 
-            Terser()
+            commonjs(),
+
+            terser({ output: { beautify: false, comments: false } })
         ]
     };
 };

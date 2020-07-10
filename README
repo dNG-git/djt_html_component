@@ -7,7 +7,8 @@ The direct JavaScript Toolbox of the direct Netware Group contain different
 modules. Each represents one aspect, feature or provides the base
 functionality for other modules.
 
-"djt-html-riot-tag" adds additional common methods to Riot.js tags.
+'djt-html-component' adds additional common methods to React like
+(Inferno.js) components.
 
 ----------------------------------------------------------------------------
 Licensing

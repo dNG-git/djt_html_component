@@ -3,7 +3,7 @@
  * All-in-one toolbox to provide more reusable JavaScript features
  *
  * (C) direct Netware Group - All rights reserved
- * https://www.direct-netware.de/redirect?djt;html;riot_tag
+ * https://www.direct-netware.de/redirect?djt;html;component
  *
  * This Source Code Form is subject to the terms of the Mozilla Public License,
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
@@ -15,25 +15,17 @@
  */
 
 import { applyDefaultConfig } from './rollup.default';
+import pkg from './package.json'
 
 export default applyDefaultConfig({
-    inputResolveConfig: {
-        browser: true,
-        main: true,
-        jsnext: false,
-        module: false,
-        extensions: [ '.js', '.json', '.ts' ],
-        moduleOnly: true,
-        preferBuiltins: true
-    },
-
-    inputTsConfig: 'tsconfig.browser-es5.json',
+    inputTsConfig: 'tsconfig.browser-es5-rollup.json',
 
     output: [
         {
-            file: 'dist/es5/djt-html-riot-tag.js',
+            file: pkg.browser,
             format: 'amd',
-            amd: { id: 'djt-html-riot-tag' },
+            amd: { id: 'djt-html-component' },
+            compact: true,
             interop: false,
             sourcemap: true
         }

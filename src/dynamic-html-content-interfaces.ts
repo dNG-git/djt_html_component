@@ -14,7 +14,18 @@
  * @license Mozilla Public License, v. 2.0
  */
 
+import { ComponentProps, ComponentState } from './component-interfaces';
+
 /**
- * Scheduled animation ID type returned by "animateLater()"
+ * "DynamicHtmlContent" properties interface
  */
-export type ScheduledAnimationIdType = number | { timeoutId: number };
+export interface DynamicHtmlContentProps extends ComponentProps {
+    content: string
+}
+
+/**
+ * "DynamicHtmlContent" state interface
+ */
+export interface DynamicHtmlContentState extends ComponentState {
+    content: string
+}

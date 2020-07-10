@@ -3,7 +3,7 @@
  * All-in-one toolbox to provide more reusable JavaScript features
  *
  * (C) direct Netware Group - All rights reserved
- * https://www.direct-netware.de/redirect?djt;html;riot_tag
+ * https://www.direct-netware.de/redirect?djt;html;component
  *
  * This Source Code Form is subject to the terms of the Mozilla Public License,
  * v. 2.0. If a copy of the MPL was not distributed with this file, You can
@@ -16,13 +16,17 @@
 
 import { ScheduledAnimationIdType } from './types';
 
+type DomEventElementTypes = Element | Window | string;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DomEventListener = (this: Element, ev: Event) => any;
+
 /**
  * DOM related utility functions.
  *
  * @author    direct Netware Group
  * @copyright (C) direct Netware Group - All rights reserved
- * @package   djt-html-riot-tag
- * @since     v1.0.0
+ * @package   djt-html-component
+ * @since     v2.0.0
  * @license   https://www.direct-netware.de/redirect?licenses;mpl2
  *            Mozilla Public License, v. 2.0
  */
@@ -34,33 +38,15 @@ export class DomUtilities {
     protected static readonly ANIMATION_DELAY_MS = 25;
 
     /**
-     * Flag indicating that a DOM manipulation library is available
-     */
-    protected static _isDomManipulationAvailable: boolean = undefined;
-    /**
      * Flag indicating that the client supports "requestAnimationFrame()"
      */
     protected static _isRequestAnimationFrameAvailable: boolean = undefined;
 
     /**
-     * Returns if a DOM manipulation library is available.
-     *
-     * @return True if a DOM manipulation library is available
-     * @since  v1.0.0
-     */
-    public static get isDomManipulationAvailable() {
-        if (this._isDomManipulationAvailable === undefined) {
-            this.validateDomManipulationSupport();
-        }
-
-        return this._isDomManipulationAvailable;
-    }
-
-    /**
      * Returns if the client supports the "requestAnimationFrame()" method.
      *
      * @return True if the client supports "requestAnimationFrame()"
-     * @since  v1.0.0
+     * @since  v2.0.0
      */
     public static get isRequestAnimationFrameAvailable() {
         if (this._isRequestAnimationFrameAvailable === undefined) {
@@ -71,13 +57,65 @@ export class DomUtilities {
     }
 
     /**
+     * Short hand method for "document.querySelector()"
+     *
+     * @param selector DOM selectors
+     *
+     * @return DOM element matched first
+     * @since  v2.0.0
+     */
+    public static $(selector: DomEventElementTypes) {
+        const _return = (typeof selector == 'string' ? document.querySelector(selector) : selector);
+
+        if (_return === null) {
+            throw new Error('Selector has not matched any DOM element');
+        }
+
+        return _return;
+    }
+
+    /**
+     * Short hand method for "element.addEventListener()"
+     *
+     * @param selector DOM selectors
+     *
+     * @return DOM element matched first
+     * @since  v2.0.0
+     */
+    public static addEventListener(element: DomEventElementTypes, event: string, listener: DomEventListener, options?: unknown) {
+        if (!(element instanceof Element)) {
+            element = this.$(element);
+        }
+
+        element.addEventListener(event, listener, options);
+    }
+
+    /**
+     * Short hand method for "element.addEventListener()"
+     *
+     * @param selector DOM selectors
+     *
+     * @return DOM element matched first
+     * @since  v2.0.0
+     */
+    public static addEventOneTimeListener(element: DomEventElementTypes, event: string, listener: DomEventListener, options?: unknown) {
+        const wrappedListener = function (this: Element, ev: Event) {
+            DomUtilities.removeEventListener(element, event, wrappedListener, options);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return listener.call(this, ev);
+        };
+
+        this.addEventListener(element, event, wrappedListener, options);
+    }
+
+    /**
      * Schedule an given animation callback.
      *
      * @param callback Animation callback
      * @param timeout Additional time to wait in milliseconds
      *
      * @return Scheduled animation ID
-     * @since  v1.0.0
+     * @since  v2.0.0
      */
     public static animateLater(callback: (timestamp?: number) => void, timeout?: number) {
         let animationId;
@@ -105,7 +143,7 @@ export class DomUtilities {
      *
      * @param animationId Animation ID given by "animateLater()"
      *
-     * @since v1.0.0
+     * @since v2.0.0
      */
     public static cancelAnimateLater(animationId: ScheduledAnimationIdType) {
         if (this.isRequestAnimationFrameAvailable && typeof animationId == 'number') {
@@ -120,20 +158,39 @@ export class DomUtilities {
     }
 
     /**
+     * Creates a cross-browser compatible event.
+     *
+     * @param selector DOM selectors
+     *
+     * @return DOM element matched first
+     * @since  v2.0.0
+     */
+    public static createEvent(event: string, bubbles = true, cancelable = true) {
+        const _return = (
+            typeof CustomEvent != 'undefined'
+            ? document.createEvent('CustomEvent') : document.createEvent('Event')
+        );
+
+        _return.initEvent(event, bubbles, cancelable);
+
+        return _return;
+    }
+
+    /**
      * Returns the given hexadecimal value as a number if possible.
      *
      * @param value hexadecimal value
      *
      * @return Value as number; undefined otherwise
-     * @since  v1.0.0
+     * @since  v2.0.0
      */
     public static getHexValueAsNumber(value: string) {
         let numberValue: number;
 
         if (typeof value == 'string') {
-            if (value[0] == '#') {
+            if (value[0] === '#') {
                 value = value.substr(1);
-            } else if (value.substr(0, 2) == '0x') {
+            } else if (value.substr(0, 2) === '0x') {
                 value = value.substr(2);
             }
         }
@@ -150,7 +207,7 @@ export class DomUtilities {
      * @param value Float value
      *
      * @return Float value as number; undefined otherwise
-     * @since  v1.0.0
+     * @since  v2.0.0
      */
     public static getValueAsFloatNumber(value: string) {
         let numberValue: number;
@@ -167,7 +224,7 @@ export class DomUtilities {
      * @param value Decimal value
      *
      * @return Value as number; undefined otherwise
-     * @since  v1.0.0
+     * @since  v2.0.0
      */
     public static getValueAsNumber(value: string) {
         let numberValue: number;
@@ -179,18 +236,25 @@ export class DomUtilities {
     }
 
     /**
-     * Validates if a DOM manipulation library is available.
+     * Short hand method for "element.removeEventListener()"
      *
-     * @since v1.0.0
+     * @param selector DOM selectors
+     *
+     * @return DOM element matched first
+     * @since  v2.0.0
      */
-    protected static validateDomManipulationSupport() {
-        this._isDomManipulationAvailable = (typeof $ != 'undefined');
+    public static removeEventListener(element: DomEventElementTypes, event: string, listener: DomEventListener, options?: unknown) {
+        if (!(element instanceof Element)) {
+            element = this.$(element);
+        }
+
+        element.removeEventListener(event, listener, options);
     }
 
     /**
      * Validates if the client supports the "requestAnimationFrame()" method.
      *
-     * @since v1.0.0
+     * @since v2.0.0
      */
     protected static validateRequestAnimationFrameSupport() {
         this._isRequestAnimationFrameAvailable = ('requestAnimationFrame' in self);

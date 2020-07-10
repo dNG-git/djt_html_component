@@ -2,8 +2,7 @@
     "extends": "./tsconfig.default.json",
 
     "compilerOptions": {
-        "target": "es5",
-        "outDir": "./dist/es5",
+        "module": "es2015",
 
         "declaration": false
     }
