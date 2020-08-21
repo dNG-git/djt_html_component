@@ -9,6 +9,7 @@
         "inlineSources": true,
         "jsx": "react",
         "jsxFactory": "createElement",
+        "jsxFragmentFactory": "Fragment",
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": false,
