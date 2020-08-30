@@ -24,7 +24,7 @@ export default applyDefaultConfig({
         {
             file: pkg.browser,
             format: 'amd',
-            amd: { id: 'djt-html-component' },
+            amd: { id: pkg.name },
             compact: true,
             interop: false,
             sourcemap: true
