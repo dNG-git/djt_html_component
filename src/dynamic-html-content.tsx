@@ -86,20 +86,28 @@ export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, Dynam
      * @since  v2.1.0
      */
     public static getDerivedStateFromProps(props: DynamicHtmlContentProps, state: DynamicHtmlContentState): DynamicHtmlContentState {
-        const _return = super.getDerivedStateFromProps(props, state) as DynamicHtmlContentState;
+        let changedStates = super.getDerivedStateFromProps(props, state) as DynamicHtmlContentState;
 
-        if (_return) {
-            if (props.className !== undefined) {
-                _return.cssClasses = props.className;
-            }
-
-            if (props.style !== undefined) {
-                _return.cssStyle = props.style;
-            }
-
-            _return.content = (props.content === undefined ? '' : props.content);
+        if (changedStates) {
+            changedStates['cssClasses'] = '';
+            changedStates['content'] = '';
+            changedStates['cssStyle'] = '';
+        } else {
+            changedStates = { } as DynamicHtmlContentState;
         }
 
-        return _return;
+        if (props.className !== undefined) {
+            changedStates['cssClasses'] = props.className;
+        }
+
+        if (props.content !== undefined) {
+            changedStates['content'] = props.content;
+        }
+
+        if (props.style !== undefined) {
+            changedStates['cssStyle'] = props.style;
+        }
+
+        return (Object.keys(changedStates).length ? changedStates : null);
     }
 }
