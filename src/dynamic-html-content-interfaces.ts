@@ -17,9 +17,14 @@
 import { ComponentProps, ComponentState } from './component-interfaces';
 
 /**
+ * Event map type
+ */
+
+/**
  * "DynamicHtmlContent" properties interface
  */
 export interface DynamicHtmlContentProps extends ComponentProps {
+    attributes?: { [key: string]: unknown },
     className?: string,
     content?: string,
     style?: CSSProperties | string
@@ -29,6 +34,7 @@ export interface DynamicHtmlContentProps extends ComponentProps {
  * "DynamicHtmlContent" state interface
  */
 export interface DynamicHtmlContentState extends ComponentState {
+    attributes?: { [key: string]: unknown },
     cssClasses: string,
     cssStyle: CSSProperties | string,
     content: string

@@ -61,6 +61,7 @@ export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, Dynam
     class={ this.state.cssClasses }
     dangerouslySetInnerHTML={{ __html: this.state.content }}
     style={ this.state.cssStyle }
+    { ...this.state.attributes }
 />
         );
     }
@@ -94,6 +95,10 @@ export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, Dynam
             changedStates['cssStyle'] = '';
         } else {
             changedStates = { } as DynamicHtmlContentState;
+        }
+
+        if (props.attributes !== undefined) {
+            changedStates['attributes'] = props.attributes;
         }
 
         if (props.className !== undefined) {
