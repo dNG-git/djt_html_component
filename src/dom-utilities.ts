@@ -177,6 +177,85 @@ export class DomUtilities {
     }
 
     /**
+     * Returns a string separated by the given separator and without values to be
+     * filtered.
+     *
+     * @param value Initial string
+     * @param filteredValues String values to be filtered out
+     * @param separator Value separator
+     *
+     * @return Filtered string
+     * @since  v2.1.0
+     */
+    private static _getFilteredString(value: string, filteredValues: string[], additionalValues: string | string[], prepend: boolean, separator = ' ') {
+        const valueList = value.split(separator).filter((value) => {
+            return (!filteredValues.includes(value));
+        });
+
+        if (additionalValues !== undefined) {
+            if (typeof additionalValues == 'string') {
+                additionalValues = additionalValues.split(separator);
+            }
+
+            // eslint-disable-next-line @typescript-eslint/unbound-method
+            const valueListCallable = (prepend ? valueList.unshift : valueList.push);
+
+            for (const additionalValue of additionalValues) {
+                valueListCallable.call(valueList, additionalValue);
+            }
+        }
+
+        return valueList.join(separator);
+    }
+
+    /**
+     * Returns a string separated by the given separator and without values to be
+     * filtered.
+     *
+     * @param value Initial string
+     * @param filteredValues String values to be filtered out
+     * @param separator Value separator
+     *
+     * @return Filtered string
+     * @since  v2.1.0
+     */
+    public static getFilteredString(value: string, filteredValues: string[], separator = ' ') {
+        return this._getFilteredString(value, filteredValues, undefined, false, separator);
+    }
+
+    /**
+     * Returns a string separated by the given separator, without values to be
+     * filtered and with additional values appended.
+     *
+     * @param value Initial string
+     * @param filteredValues String values to be filtered out
+     * @param additionalValues String values to be appended
+     * @param separator Value separator
+     *
+     * @return Filtered string
+     * @since  v2.1.0
+     */
+    public static getFilteredAndAppendedString(value: string, filteredValues: string[], additionalValues: string | string[], separator = ' ') {
+        return this._getFilteredString(value, filteredValues, additionalValues, false, separator);
+    }
+
+    /**
+     * Returns a string separated by the given separator, without values to be
+     * filtered and with additional values prepended.
+     *
+     * @param value Initial string
+     * @param filteredValues String values to be filtered out
+     * @param additionalValues String values to be prepended
+     * @param separator Value separator
+     *
+     * @return Filtered string
+     * @since  v2.1.0
+     */
+    public static getFilteredAndPrependedString(value: string, filteredValues: string[], additionalValues: string | string[], separator = ' ') {
+        return this._getFilteredString(value, filteredValues, additionalValues, true, separator);
+    }
+
+    /**
      * Returns the given hexadecimal value as a number if possible.
      *
      * @param value hexadecimal value
