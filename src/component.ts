@@ -45,6 +45,11 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
     protected static readonly DOM_UI_CHANGE_DELAY_MS = 85;
 
     /**
+     * Underlying original element node
+     */
+    protected originalElement: Element = undefined;
+
+    /**
      * Constructor (Component)
      *
      * @param props Component props
@@ -52,7 +57,7 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
      *
      * @since v2.0.0
      */
-    constructor(props?: P, context?: ComponentContext) {
+    constructor(props?: P & ComponentProps, context?: ComponentContext) {
         super(props, context);
 
         if (!props) {
@@ -61,6 +66,11 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
 
         if (!this.context) {
             this.context = { };
+        }
+
+        if ((!this.originalElement) && 'originalElement' in props) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            this.originalElement = props.originalElement;
         }
 
         if (!('rootComponent' in this.context)) {
@@ -360,12 +370,12 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
                 _return.id = this.getRandomDomId();
             }
 
-            if (typeof props.listenForWindowResize != undefined) {
-                _return.isWindowResizeRelevant = !([ '0', false ].includes(props.listenForWindowResize));
+            if (_return['listenForWindowResize'] !== undefined) {
+                _return.isWindowResizeRelevant = !([ '0', false, undefined ].includes(props.listenForWindowResize));
                 delete _return.listenForWindowResize;
             }
 
-            if (typeof _return.originalElementData != undefined) {
+            if (_return['originalElementData'] !== undefined) {
                 delete _return.originalElementData;
             }
         }
@@ -470,6 +480,7 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
             props = this.getPropsFromOriginalElementData(originalElementData);
         }
 
+        props['originalElement'] = element;
         props['originalElementData'] = originalElementData;
 
         if (clearElement) {

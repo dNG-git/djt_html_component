@@ -38,7 +38,9 @@ export interface ComponentClassInterface<P = ComponentProps, S = ComponentState>
 /**
  * "Component" context interface
  */
-export interface ComponentContext { rootComponent?: _Component }
+export interface ComponentContext {
+    rootComponent?: _Component
+}
 
 /**
  * "Component" interface
@@ -56,6 +58,7 @@ export interface ComponentInterface<P, S> extends IComponent<P, S> {
 interface _ComponentProps {
     id?: string,
     listenForWindowResize?: string | boolean,
+    originalElement?: Element,
     originalElementData?: OriginalElementData
 }
 

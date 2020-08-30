@@ -3,7 +3,7 @@
     "license": "MPL-2.0",
     "description": "'djt-html-component' adds additional common methods to React like (Inferno.js) components.",
     "homepage": "https://www.direct-netware.de/redirect?djt;html;component",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "private": true,
     "repository": {
         "type": "git",
