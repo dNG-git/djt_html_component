@@ -54,7 +54,15 @@ export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, Dynam
     public render() {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const TagName = this.instanceClass.attachingTagName;
-        return <TagName dangerouslySetInnerHTML={{ __html: this.state.content }} />;
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        return (
+<TagName
+    class={ this.state.cssClasses }
+    dangerouslySetInnerHTML={{ __html: this.state.content }}
+    style={ this.state.cssStyle }
+/>
+        );
     }
 
     /**
@@ -65,5 +73,33 @@ export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, Dynam
      */
     public static get componentName() {
         return 'djt-dynamic-html-content';
+    }
+
+    /**
+     * reactjs.org: It is invoked right before calling the render method, both on
+     * the initial mount and on subsequent updates.
+     *
+     * @param props Current props
+     * @param state Current state
+     *
+     * @return Updated state values object; null otherwise
+     * @since  v2.1.0
+     */
+    public static getDerivedStateFromProps(props: DynamicHtmlContentProps, state: DynamicHtmlContentState): DynamicHtmlContentState {
+        const _return = super.getDerivedStateFromProps(props, state) as DynamicHtmlContentState;
+
+        if (_return) {
+            if (props.className !== undefined) {
+                _return.cssClasses = props.className;
+            }
+
+            if (props.style !== undefined) {
+                _return.cssStyle = props.style;
+            }
+
+            _return.content = (props.content === undefined ? '' : props.content);
+        }
+
+        return _return;
     }
 }

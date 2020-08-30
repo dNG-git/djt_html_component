@@ -20,12 +20,16 @@ import { ComponentProps, ComponentState } from './component-interfaces';
  * "DynamicHtmlContent" properties interface
  */
 export interface DynamicHtmlContentProps extends ComponentProps {
-    content: string
+    className?: string,
+    content?: string,
+    style?: CSSProperties | string
 }
 
 /**
  * "DynamicHtmlContent" state interface
  */
 export interface DynamicHtmlContentState extends ComponentState {
+    cssClasses: string,
+    cssStyle: CSSProperties | string,
     content: string
 }
