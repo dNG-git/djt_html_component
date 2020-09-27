@@ -87,7 +87,9 @@ export class OriginalElementWalker {
 
         let isInnerHtmlAdded = false;
 
-        if (_return.value !== null && nodeNamesWithInnerHtml.includes(_return.name)) {
+        if (_return.value !== null
+            && (nodeNamesWithInnerHtml.includes(_return.name) || nodeNamesWithInnerHtml.includes('*'))
+        ) {
             isInnerHtmlAdded = true;
             _return['html'] = element.innerHTML;
         }
