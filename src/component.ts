@@ -25,6 +25,7 @@ import { OriginalElementData, OriginalElementWalker } from './original-element-d
 
 import { createElement } from 'inferno-create-element';
 import { DomUtilities } from './dom-utilities';
+import { findDOMNode } from 'inferno-extras';
 
 /**
  * Abstract React component class supporting enhanced mounting options.
@@ -101,7 +102,23 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
      * @since v2.0.0
      */
     public componentDidMount() {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        Component.getDomElement(this)._x_component = this;
+
         this.onStateChanged(this.props, { } as S & ComponentState);
+    }
+
+    /**
+     * reactjs.org: It is invoked immediately after updating occurs.
+
+     * @param oldProps Old props
+     * @param oldState Old state
+     * @param _ Snapshot data defined in "getSnapshotBeforeUpdate()"
+     *
+     * @since v2.2.0
+     */
+    public componentDidUpdate(oldProps: P, oldState: S & ComponentState, _?: unknown) {
+        this.onStateChanged(oldProps, oldState);
     }
 
     /**
@@ -125,19 +142,6 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
      */
     protected fireXElementResizeEvent() {
         this.fireDomElementEvent('x-element-resize');
-    }
-
-    /**
-     * reactjs.org: It is invoked right before the most recently rendered output is
-     * committed to e.g. the DOM.
-
-     * @param oldProps Old props
-     * @param oldState Old state
-     *
-     * @since v2.0.0
-     */
-    public getSnapshotBeforeUpdate(oldProps: P, oldState: S & ComponentState) {
-        this.onStateChanged(oldProps, oldState);
     }
 
     /**
@@ -336,8 +340,8 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
         let _return = null;
 
         /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        if (element && (element as any).$V) {
-            _return = (element as any).$V;
+        if (element && (element as any)._x_component) {
+            _return = (element as any)._x_component;
         }
         /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
@@ -384,23 +388,16 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
     }
 
     /**
-     * Returns the React component instance under the DOM element given.
+     * Returns the DOM element for the React component instance given.
      *
      * @param element (X)HTML5 element
      *
-     * @return React component
+     * @return DOM element
      * @since  v2.0.0
      */
     protected static getDomElement(component: Component) {
-        let _return = null;
-
-        if (component && component.$LI) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            _return = component.$LI.dom;
-        }
-
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return _return;
+        return findDOMNode(component);
     }
 
     /**
