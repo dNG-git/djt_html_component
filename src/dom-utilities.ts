@@ -75,6 +75,24 @@ export class DomUtilities {
     }
 
     /**
+     * Short hand method for "document.querySelector()"
+     *
+     * @param selector DOM selectors
+     *
+     * @return DOM element matched first
+     * @since  v2.0.0
+     */
+    public static $$(selector: string) {
+        const _return = document.querySelectorAll(selector);
+
+        if (_return.length < 1) {
+            throw new Error('Selector has not matched any DOM element');
+        }
+
+        return _return;
+    }
+
+    /**
      * Short hand method for "element.addEventListener()"
      *
      * @param selector DOM selectors

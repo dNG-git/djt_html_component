@@ -17,6 +17,7 @@
 import {
     Component as _Component,
     IComponentConstructor as ComponentConstructor,
+    InfernoNode,
     render
 } from 'inferno';
 
@@ -450,13 +451,13 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
     }
 
     /**
-     * Mount the React component instance under the DOM element given
+     * Mounts the React component instance under the DOM element given.
      *
      * @param element (X)HTML5 element or DOM selector
      * @param clearElement Clear existing children before mounting
      * @param props Component props
      *
-     * @return Tag or array of tags mounted
+     * @return React component instance mounted
      * @since  v2.0.0
      */
     public static mount(element?: Element | Window | string, clearElement = false, props?: ComponentProps) {
@@ -496,6 +497,33 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
         render(vNode, element);
 
         return vNode.children;
+    }
+
+    /**
+     * Mounts all React component instances matching DOM selector given.
+     *
+     * @param selector DOM selector
+     * @param clearElement Clear existing children before mounting
+     * @param props Component props
+     *
+     * @return Array of React component instances mounted
+     * @since  v2.2.0
+     */
+    public static mountAll(selector?: string, clearElement = false, props?: ComponentProps) {
+        const _return = [ ] as InfernoNode[];
+
+        if (selector === undefined) {
+            selector = this.componentName;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+        const elements = DomUtilities.$$(selector);
+
+        elements.forEach((element) => {
+            _return.push(this.mount(element, clearElement, props));
+        });
+
+        return _return;
     }
 
     /**
