@@ -87,32 +87,19 @@ export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, Dynam
      * @since  v2.1.0
      */
     public static getDerivedStateFromProps(props: DynamicHtmlContentProps, state: DynamicHtmlContentState): DynamicHtmlContentState {
-        let changedStates = super.getDerivedStateFromProps(props, state) as DynamicHtmlContentState;
+        let _return = super.getDerivedStateFromProps(props, state) as DynamicHtmlContentState;
 
-        if (changedStates) {
-            changedStates['cssClasses'] = '';
-            changedStates['content'] = '';
-            changedStates['cssStyle'] = '';
-        } else {
-            changedStates = { } as DynamicHtmlContentState;
+        if (state === null) {
+            if (!_return) {
+                _return = { } as DynamicHtmlContentState;
+            }
+
+            _return['attributes'] = props.attributes;
+            _return['cssClasses'] = (props.className ? props.className : '');
+            _return['content'] = (props.content ? props.content : '');
+            _return['cssStyle'] = (props.style ? props.style : '');
         }
 
-        if (props.attributes !== undefined) {
-            changedStates['attributes'] = props.attributes;
-        }
-
-        if (props.className !== undefined) {
-            changedStates['cssClasses'] = props.className;
-        }
-
-        if (props.content !== undefined) {
-            changedStates['content'] = props.content;
-        }
-
-        if (props.style !== undefined) {
-            changedStates['cssStyle'] = props.style;
-        }
-
-        return (Object.keys(changedStates).length ? changedStates : null);
+        return _return;
     }
 }
