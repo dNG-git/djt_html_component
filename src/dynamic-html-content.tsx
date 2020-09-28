@@ -86,7 +86,7 @@ export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, Dynam
      * @return Updated state values object; null otherwise
      * @since  v2.1.0
      */
-    public static getDerivedStateFromProps(props: DynamicHtmlContentProps, state: DynamicHtmlContentState): DynamicHtmlContentState {
+    public static getDerivedStateFromProps(props: DynamicHtmlContentProps, state: DynamicHtmlContentState) {
         let _return = super.getDerivedStateFromProps(props, state) as DynamicHtmlContentState;
 
         if (state === null) {
