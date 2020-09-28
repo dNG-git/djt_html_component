@@ -17,6 +17,7 @@
 import { DynamicHtmlContentProps, DynamicHtmlContentState } from './dynamic-html-content-interfaces';
 
 import { Component } from './component';
+import { ComponentContext } from './component-interfaces';
 import { createElement } from 'inferno-create-element';
 
 /**
@@ -29,7 +30,11 @@ import { createElement } from 'inferno-create-element';
  * @license   https://www.direct-netware.de/redirect?licenses;mpl2
  *            Mozilla Public License, v. 2.0
  */
-export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, DynamicHtmlContentState> {
+export class DynamicHtmlContent<
+    P extends DynamicHtmlContentProps = DynamicHtmlContentProps,
+    S extends DynamicHtmlContentState = DynamicHtmlContentState,
+    C = ComponentContext
+> extends Component<P, S, C> {
     /**
      * reactjs.org: It is invoked right before the most recently rendered output is
      * committed to e.g. the DOM.
@@ -39,7 +44,7 @@ export class DynamicHtmlContent extends Component<DynamicHtmlContentProps, Dynam
      *
      * @since v2.0.0
      */
-    public getSnapshotBeforeUpdate(_: DynamicHtmlContentProps, oldState: DynamicHtmlContentState) {
+    public getSnapshotBeforeUpdate(_: P, oldState: S) {
         if (this.state.content !== oldState.content) {
             this.fireDomElementEvent('x-dom-changed');
         }

@@ -38,9 +38,11 @@ import { findDOMNode } from 'inferno-extras';
  * @license   https://www.direct-netware.de/redirect?licenses;mpl2
  *            Mozilla Public License, v. 2.0
  */
-export abstract class Component<P = ComponentProps, S = ComponentState>
-    extends _Component<P & ComponentProps, S & ComponentState>
-    implements ComponentInterface<P & ComponentProps, S & ComponentState> {
+export abstract class Component<
+    P extends ComponentProps = ComponentProps,
+    S extends ComponentState = ComponentState,
+    C extends ComponentContext = ComponentContext
+> extends _Component<P, S> implements ComponentInterface<P, S> {
     /**
      * Milliseconds to wait after the UI DOM event occurred before callbacks are executed.
      */
@@ -59,7 +61,7 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
      *
      * @since v2.0.0
      */
-    constructor(props?: P & ComponentProps, context?: ComponentContext) {
+    constructor(props?: P, context?: C) {
         super(props, context);
 
         if (!props) {
@@ -118,7 +120,7 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
      *
      * @since v2.2.0
      */
-    public componentDidUpdate(oldProps: P, oldState: S & ComponentState, _?: unknown) {
+    public componentDidUpdate(oldProps: P, oldState: S, _?: unknown) {
         this.onStateChanged(oldProps, oldState);
     }
 
@@ -153,7 +155,7 @@ export abstract class Component<P = ComponentProps, S = ComponentState>
      *
      * @since v2.0.0
      */
-    public onStateChanged(_: P, oldState: ComponentState & S) {
+    public onStateChanged(_: P, oldState: S) {
         /* eslint-disable @typescript-eslint/unbound-method */
         if (this.state.isElementSizeRelevant !== oldState.isElementSizeRelevant) {
             if (this.state.isElementSizeRelevant) {

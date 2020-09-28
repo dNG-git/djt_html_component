@@ -32,7 +32,11 @@ import PromisedRequire from 'djt-promised-require';
  * @license   https://www.direct-netware.de/redirect?licenses;mpl2
  *            Mozilla Public License, v. 2.0
  */
-export class LazyLoader extends Component<LazyLoaderProps, LazyLoaderState> {
+export class LazyLoader<
+    P extends LazyLoaderProps = LazyLoaderProps,
+    S extends LazyLoaderState = LazyLoaderState,
+    C = ComponentContext
+> extends Component<P, S, C> {
     /**
      * Constructor (LazyLoader)
      *
@@ -41,7 +45,7 @@ export class LazyLoader extends Component<LazyLoaderProps, LazyLoaderState> {
      *
      * @since v2.0.0
      */
-    constructor(props?: LazyLoaderProps, context?: ComponentContext) {
+    constructor(props?: P, context?: C) {
         super(props, context);
 
         this.onComponentLoaded = this.onComponentLoaded.bind(this);
