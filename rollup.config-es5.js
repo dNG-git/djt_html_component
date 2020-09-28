@@ -31,6 +31,7 @@ export default applyDefaultConfig({
             format: 'amd',
             amd: { id: pkg.name },
             compact: true,
+            inlineDynamicImports: true,
             interop: false,
             sourcemap: true
         }

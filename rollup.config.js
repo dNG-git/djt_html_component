@@ -25,6 +25,7 @@ export default applyDefaultConfig({
             file: `./dist/${pkg.name}.js`,
             format: 'esm',
             compact: true,
+            inlineDynamicImports: true,
             interop: false,
             sourcemap: true
         }

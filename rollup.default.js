@@ -41,8 +41,6 @@ export function applyDefaultConfig(customConfig) {
         input: 'src/module.ts',
         output: customConfig.output,
 
-        inlineDynamicImports: true,
-
         plugins: [
             replace({ 'process.env.NODE_ENV': "'production'" }),
 
