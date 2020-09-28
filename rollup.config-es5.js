@@ -18,11 +18,16 @@ import { applyDefaultConfig } from './rollup.default';
 import pkg from './package.json'
 
 export default applyDefaultConfig({
+    inputResolveConfig: {
+        extensions: [ '.js', '.json' ],
+        mainFields: [ 'browser', 'main' ]
+    },
+
     inputTsConfig: 'tsconfig.browser-es5-rollup.json',
 
     output: [
         {
-            file: pkg.browser,
+            file: `./dist/es5/${pkg.name}.js`,
             format: 'amd',
             amd: { id: pkg.name },
             compact: true,

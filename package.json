@@ -11,7 +11,7 @@
     },
     "main": "./lib/cjs/module.js",
     "module": "./lib/module.js",
-    "browser": "./dist/es5/djt-html-component.js",
+    "browser": "./lib/cjs/module.js",
     "types": "./lib/module.d.ts",
     "scripts": {
         "install-clean": "npm install --no-save",

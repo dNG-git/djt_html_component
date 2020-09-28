@@ -22,7 +22,7 @@ export default applyDefaultConfig({
 
     output: [
         {
-            file: pkg.browser.replace(/^.\/dist\/es5\//g, './dist/'),
+            file: `./dist/${pkg.name}.js`,
             format: 'esm',
             compact: true,
             interop: false,
