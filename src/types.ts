@@ -16,5 +16,7 @@
 
 /**
  * Scheduled animation ID type returned by "animateLater()"
+ *
+ * @since v1.0.0
  */
 export type ScheduledAnimationIdType = number | { timeoutId: number };

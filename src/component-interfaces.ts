@@ -25,9 +25,11 @@ import { OriginalElementData } from './original-element-data';
 
 /**
  * "Component" class interface.
+ *
+ * @since v2.0.0
  */
 export interface ComponentClassInterface<P = ComponentProps, S = ComponentState> {
-    new: (props?: P, context?: ComponentContext) => ComponentInterface<P, S>,
+    new: (props?: P) => ComponentInterface<P, S>,
 
     componentName: string,
     attachAndMount: (element?: Element | Window | string, cssClasses?: string, cssStyle?: string, props?: P) => VNode,
@@ -37,6 +39,8 @@ export interface ComponentClassInterface<P = ComponentProps, S = ComponentState>
 
 /**
  * "Component" context interface
+ *
+ * @since v2.0.0
  */
 export interface ComponentContext {
     rootComponent?: _Component
@@ -44,6 +48,8 @@ export interface ComponentContext {
 
 /**
  * "Component" interface
+ *
+ * @since v2.0.0
  */
 export interface ComponentInterface<P, S> extends IComponent<P, S> {
     onStateChanged: (oldProps: P, oldState: ComponentState & S) => void,
@@ -54,6 +60,8 @@ export interface ComponentInterface<P, S> extends IComponent<P, S> {
 
 /**
  * Additional "Component" properties extending default "Props"
+ *
+ * @since v2.0.0
  */
 interface _ComponentProps {
     id?: string,
@@ -64,11 +72,15 @@ interface _ComponentProps {
 
 /**
  * "Component" properties interface
+ *
+ * @since v2.0.0
  */
 export interface ComponentProps extends _ComponentProps, _Props<_ComponentProps, Element> { }
 
 /**
  * "Component" state interface
+ *
+ * @since v2.0.0
  */
 export interface ComponentState {
     id: string,

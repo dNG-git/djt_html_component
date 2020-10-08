@@ -15,7 +15,7 @@
  */
 
 export { Component } from './component';
-export { ComponentClassInterface, ComponentContext, ComponentInterface, ComponentProps, ComponentState } from './component-interfaces';
+export { ComponentClassInterface, ComponentContext, ComponentProps, ComponentState } from './component-interfaces';
 export { createRef, Fragment, RefObject as Ref } from 'inferno';
 export { createElement } from 'inferno-create-element';
 export { DomUtilities } from './dom-utilities';

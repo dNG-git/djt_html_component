@@ -41,12 +41,12 @@ export class LazyLoader<
      * Constructor (LazyLoader)
      *
      * @param props LazyLoader props
-     * @param context LazyLoader context
+     * @param args Additional arguments given
      *
      * @since v2.0.0
      */
-    constructor(props?: P, context?: C) {
-        super(props, context);
+    constructor(props?: P, ...args: unknown[]) {
+        super(props, ...args);
 
         this.onComponentLoaded = this.onComponentLoaded.bind(this);
         this.onComponentLoadingFailed = this.onComponentLoadingFailed.bind(this);

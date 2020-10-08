@@ -24,6 +24,7 @@ import {
 import { ComponentContext, ComponentInterface, ComponentProps, ComponentState } from './component-interfaces';
 import { OriginalElementData, OriginalElementWalker } from './original-element-data';
 
+import { ContextMap } from './context-map';
 import { createElement } from 'inferno-create-element';
 import { DomUtilities } from './dom-utilities';
 import { findDOMNode } from 'inferno-extras';
@@ -57,19 +58,22 @@ export abstract class Component<
      * Constructor (Component)
      *
      * @param props Component props
-     * @param context Component context
+     * @param args Additional arguments given
      *
      * @since v2.0.0
      */
-    constructor(props?: P, context?: C) {
-        super(props, context);
+    constructor(props?: P, ...args: unknown[]) {
+        super(props, ...args);
+
+        // Implement some "magic" to catch the Inferno.js supported context
+        /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+        if (!('_djt_map' in this.context && this.context['_djt_map'] instanceof ContextMap)) {
+            this.context['_djt_map'] = new ContextMap<C>(this.context);
+        }
+        /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
         if (!props) {
             props = { } as P;
-        }
-
-        if (!this.context) {
-            this.context = { };
         }
 
         if ((!this.originalElement) && 'originalElement' in props) {
@@ -77,14 +81,24 @@ export abstract class Component<
             this.originalElement = props.originalElement;
         }
 
-        if (!('rootComponent' in this.context)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            this.context['rootComponent'] = this;
+        if (!this.contextMap.has('rootComponent')) {
+            this.contextMap.set('rootComponent', this);
         }
 
         this.onResize = this.onResize.bind(this);
         this.onWindowResized = this.onWindowResized.bind(this);
         this.updateDomSize = this.updateDomSize.bind(this);
+    }
+
+    /**
+     * Returns the corresponding class of the calling instance.
+     *
+     * @return Class object
+     * @since  v2.0.0
+     */
+    protected get contextMap() {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        return this.context['_djt_map'] as ContextMap<C>;
     }
 
     /**

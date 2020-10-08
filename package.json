@@ -27,7 +27,7 @@
         "test": ""
     },
     "dependencies": {
-        "djt-promised-require": "git://github.com/dNG-git/djt_promised_require.git#semver:^1.3.2",
+        "djt-promised-require": "git://github.com/dNG-git/djt_promised_require.git#semver:^1.4.0",
         "inferno": "^7.4.5",
         "inferno-create-element": "^7.4.5",
         "inferno-extras": "^7.4.5"

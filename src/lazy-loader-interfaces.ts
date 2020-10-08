@@ -18,6 +18,8 @@ import { ComponentProps, ComponentState } from './component-interfaces';
 
 /**
  * "LazyLoader" properties interface
+ *
+ * @since v2.0.0
  */
 export interface LazyLoaderProps extends ComponentProps {
     componentDependencyNames?: string[],
@@ -28,6 +30,8 @@ export interface LazyLoaderProps extends ComponentProps {
 
 /**
  * "LazyLoader" state interface
+ *
+ * @since v2.0.0
  */
 export interface LazyLoaderState extends ComponentState {
     componentDependencyNames?: string[],
