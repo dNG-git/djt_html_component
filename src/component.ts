@@ -376,15 +376,14 @@ export abstract class Component<
      * @return Updated state values object; null otherwise
      * @since  v2.0.0
      */
-    public static getDerivedStateFromProps(props: ComponentProps, state: ComponentState): ComponentState {
+    public static getDerivedStateFromProps(props: ComponentProps, state: ComponentState) {
         let _return = null;
 
         if (state === null) {
             _return = {
                 isElementSizeRelevant: false,
                 isWindowResizeRelevant: false,
-                ...props,
-                ...state
+                ...props
             };
 
             if (!_return.id) {
@@ -401,7 +400,7 @@ export abstract class Component<
             }
         }
 
-        return _return;
+        return _return as ComponentState;
     }
 
     /**
