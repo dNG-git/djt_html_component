@@ -20,7 +20,7 @@ import { LazyLoaderProps, LazyLoaderState } from './lazy-loader-interfaces';
 import { Component } from './component';
 import { createElement } from 'inferno-create-element';
 
-import PromisedRequire from 'djt-promised-require';
+import PromisedRequire from '@dng-git/djt-promised-require';
 
 /**
  * Abstract Riot.js tag class supporting tag registration.

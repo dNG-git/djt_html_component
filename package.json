@@ -1,13 +1,15 @@
 {
-    "name": "djt-html-component",
+    "name": "@dng-git/djt-html-component",
     "license": "MPL-2.0",
     "description": "'djt-html-component' adds additional common methods to React like (Inferno.js) components.",
     "homepage": "https://www.direct-netware.de/redirect?djt;html;component",
     "version": "2.2.0",
-    "private": true,
     "repository": {
         "type": "git",
         "url": "https://github.com/dNG-git/djt_html_component.git"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
     },
     "main": "./lib/cjs/module.js",
     "module": "./lib/module.js",
@@ -27,10 +29,10 @@
         "test": ""
     },
     "dependencies": {
-        "djt-promised-require": "git://github.com/dNG-git/djt_promised_require.git#semver:^1.4.0",
         "inferno": "^7.4.5",
         "inferno-create-element": "^7.4.5",
-        "inferno-extras": "^7.4.5"
+        "inferno-extras": "^7.4.5",
+        "@dng-git/djt-promised-require": "git://github.com/dNG-git/djt_promised_require.git#semver:^1.4.0"
     },
     "devDependencies": {
         "eslint": "^7.9.0",
