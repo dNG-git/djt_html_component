@@ -16,6 +16,7 @@
 
 import commonjs from '@rollup/plugin-commonjs';
 import nodeResolve from '@rollup/plugin-node-resolve';
+import pkg from './package.json'
 import replace from '@rollup/plugin-replace';
 import { terser } from 'rollup-plugin-terser';
 import typescript from '@rollup/plugin-typescript';
@@ -40,6 +41,8 @@ export function applyDefaultConfig(customConfig) {
     return {
         input: 'src/module.ts',
         output: customConfig.output,
+
+        external: (pkg.config.rollup.external_packages + pkg.config.rollup.external_unscoped_packages),
 
         plugins: [
             replace({ 'process.env.NODE_ENV': "'production'" }),

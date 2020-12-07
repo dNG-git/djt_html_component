@@ -17,13 +17,21 @@
 import { applyDefaultConfig } from './rollup.default';
 import pkg from './package.json'
 
+const pkgName = pkg.name.replace(/\@.+\//, '');
+const paths = { };
+
+for (const scopedPackage of pkg.config.rollup.external_unscoped_packages) {
+    paths[scopedPackage] = scopedPackage.replace(/\@.+\//, '');
+}
+
 export default applyDefaultConfig({
     inputTsConfig: 'tsconfig.browser-module-rollup.json',
 
     output: [
         {
-            file: `./dist/${pkg.name}.js`,
+            file: `./dist/${pkgName}.js`,
             format: 'esm',
+            paths: paths,
             compact: true,
             inlineDynamicImports: true,
             interop: false,

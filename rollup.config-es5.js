@@ -17,6 +17,13 @@
 import { applyDefaultConfig } from './rollup.default';
 import pkg from './package.json'
 
+const pkgName = pkg.name.replace(/\@.+\//, '');
+const paths = { };
+
+for (const scopedPackage of pkg.config.rollup.external_unscoped_packages) {
+    paths[scopedPackage] = scopedPackage.replace(/\@.+\//, '');
+}
+
 export default applyDefaultConfig({
     inputResolveConfig: {
         extensions: [ '.js', '.json' ],
@@ -27,9 +34,10 @@ export default applyDefaultConfig({
 
     output: [
         {
-            file: `./dist/es5/${pkg.name}.js`,
+            file: `./dist/es5/${pkgName}.js`,
             format: 'amd',
-            amd: { id: pkg.name },
+            amd: { id: pkgName },
+            paths: paths,
             compact: true,
             inlineDynamicImports: true,
             interop: false,

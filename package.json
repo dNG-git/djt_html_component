@@ -8,6 +8,12 @@
         "type": "git",
         "url": "https://github.com/dNG-git/djt_html_component.git"
     },
+    "config": {
+        "rollup": {
+            "external_packages": [ ],
+            "external_unscoped_packages": [ ]
+        }
+    },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     },
