@@ -42,7 +42,7 @@ export function applyDefaultConfig(customConfig) {
         input: 'src/module.ts',
         output: customConfig.output,
 
-        external: (pkg.config.rollup.external_packages + pkg.config.rollup.external_unscoped_packages),
+        external: [ ...pkg.config.rollup.external_packages, ...pkg.config.rollup.external_unscoped_packages ],
 
         plugins: [
             replace({ 'process.env.NODE_ENV': "'production'" }),
